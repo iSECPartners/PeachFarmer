@@ -18,9 +18,10 @@ namespace PeachFarmerClient
             CommandLineOptions options = new CommandLineOptions();
             if (CommandLine.Parser.Default.ParseArguments(args, options))
             {
-                if (options.WorkerHost == null && options.WorkerHostFile == null)
+                string valiationError = options.GetValidationError();
+                if (valiationError != null)
                 {
-                    Console.WriteLine("Must enter a target host or file of target hosts.");
+                    Console.WriteLine(valiationError);
                     return;
                 }
 

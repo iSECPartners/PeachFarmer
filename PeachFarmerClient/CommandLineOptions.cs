@@ -59,5 +59,15 @@ namespace PeachFarmerClient
             return HelpText.AutoBuild(this,
               (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
         }
+
+        public string GetValidationError()
+        {
+            if ((WorkerHost == null) && (WorkerHostFile == null))
+            {
+                return "Must enter a target host or file of target hosts.";
+            }
+
+            return null;
+        }
     }
 }
