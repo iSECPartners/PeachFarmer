@@ -27,16 +27,13 @@ namespace PeachFarmerLib
 
         public Stream GetOutputStream(string filePath)
         {
-            try
+            string directoryName = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(directoryName))
             {
-                return File.Open(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
-            }
-            catch (DirectoryNotFoundException)
-            {
-                string directoryName = Path.GetDirectoryName(filePath);
                 Directory.CreateDirectory(directoryName);
-                return File.Open(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
             }
+
+            return File.Open(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
         }
 
         public Stream GetReadStream(string filePath)
