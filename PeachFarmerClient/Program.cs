@@ -21,6 +21,7 @@ namespace PeachFarmerClient
                 string valiationError = options.GetValidationError();
                 if (valiationError != null)
                 {
+                    Console.WriteLine(options.GetUsage());
                     Console.WriteLine(valiationError);
                     return;
                 }
