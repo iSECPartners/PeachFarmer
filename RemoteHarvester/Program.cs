@@ -17,22 +17,10 @@ namespace RemoteHarvester
         static void Main(string[] args)
         {
             CommandLineOptions options = new CommandLineOptions();
-            if (CommandLine.Parser.Default.ParseArguments(args, options) && ValidateOptions(options))
+            if (CommandLine.Parser.Default.ParseArguments(args, options))
             {
                 DoMonitorFolder(options.LogFolder, PeachFarmerProtocol.FarmerPort, options.Password, options.ServerCertFile, options.ClientCertFile);
             }
-        }
-
-        private static bool ValidateOptions(CommandLineOptions options)
-        {
-            if (options.LogFolder == null)
-            {
-                Console.WriteLine(options.GetUsage());
-                Console.WriteLine("Error: Must specify a log directory.");
-                return false;
-            }
-
-            return true;
         }
 
         private static void DoMonitorFolder(string folderPath, int listenPort, string connectionPassword, string serverCertFile, string clientCertFile)
