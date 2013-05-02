@@ -11,7 +11,7 @@ namespace PeachFarmerClient
     [Serializable()]
     public class PullHistory : IPullHistory
     {
-        Dictionary<string, DateTime> _lastPullTimes;
+        private Dictionary<string, DateTime> _lastPullTimes;
 
         public PullHistory()
         {

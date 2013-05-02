@@ -10,13 +10,13 @@ namespace PeachFarmerClient
 {
     public class FilePuller
     {
-        IDataConnection _dataConnection;
+        private IDataConnection _dataConnection;
 
-        IFolderUnpacker _folderUnpacker;
+        private IFolderUnpacker _folderUnpacker;
 
-        IPullHistory _pullHistory;
+        private IPullHistory _pullHistory;
 
-        string _serverPassword;
+        private string _serverPassword;
 
         public FilePuller(IDataConnection dataConection, IFolderUnpacker folderUnpacker, IPullHistory pullHistory, string serverPassword)
         {

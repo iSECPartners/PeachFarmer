@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace RemoteHarvester
 {
-    class Program
+    public class Program
     {
         private const int ConnectionTimeout = 5;
 

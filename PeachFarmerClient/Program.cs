@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PeachFarmerClient
 {
-    class Program
+    public class Program
     {
         private const int ConnectionTimeoutInSeconds = 30;
 
