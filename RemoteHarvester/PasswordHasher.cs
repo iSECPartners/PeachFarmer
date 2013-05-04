@@ -12,7 +12,7 @@ namespace RemoteHarvester
         public static byte[] CalculateHash(string password)
         {
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-            SHA256Managed hashstring = new SHA256Managed();
+            var hashstring = HashAlgorithm.Create();
             return hashstring.ComputeHash(passwordBytes);
         }
     }
