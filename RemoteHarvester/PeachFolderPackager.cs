@@ -90,21 +90,12 @@ namespace RemoteHarvester
             }
 
             ZipArchiveEntry entry = zipArchive.CreateEntry(zipEntryName);
-            using (BinaryWriter streamWriter = new BinaryWriter(entry.Open()))
+
+            using (Stream fileStream = _fileSystem.GetReadStream(filename))
             {
-                using (BinaryReader streamReader = new BinaryReader(_fileSystem.GetReadStream(filename)))
+                using (Stream archiveStream = entry.Open())
                 {
-                    try
-                    {
-                        while (true)
-                        {
-                            streamWriter.Write(streamReader.ReadByte());
-                        }
-                    }
-                    catch (EndOfStreamException)
-                    {
-                        ;
-                    }
+                    fileStream.CopyTo(archiveStream);
                 }
             }
         }
