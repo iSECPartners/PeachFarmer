@@ -15,6 +15,11 @@ namespace PeachFarmerClient
 
         static void Main(string[] args)
         {
+            new Program(args);
+        }
+
+        private Program(String[] args)
+        {
             CommandLineOptions options = new CommandLineOptions();
             if (CommandLine.Parser.Default.ParseArguments(args, options))
             {
@@ -36,7 +41,7 @@ namespace PeachFarmerClient
             }
         }
 
-        private static List<string> WorkerHostsFromCommandLineOptions(CommandLineOptions options)
+        private List<string> WorkerHostsFromCommandLineOptions(CommandLineOptions options)
         {
             List<string> workerHosts = new List<string>();
 
@@ -62,7 +67,7 @@ namespace PeachFarmerClient
             return workerHosts;
         }
 
-        private static void PullFilesFromMultipleWorkers(List<string> workerHosts, string destinationFolder, string password, string serverCertFile, string clientCertFile)
+        private void PullFilesFromMultipleWorkers(List<string> workerHosts, string destinationFolder, string password, string serverCertFile, string clientCertFile)
         {
             foreach (string workerHost in workerHosts)
             {
@@ -81,7 +86,7 @@ namespace PeachFarmerClient
             }
         }
 
-        private static void PullFilesFromWorker(string workerHost, string destinationFolder, string password, string serverCertFile, string clientCertFile)
+        private void PullFilesFromWorker(string workerHost, string destinationFolder, string password, string serverCertFile, string clientCertFile)
         {
             Console.WriteLine("Pulling files from {0}", workerHost);
 
@@ -100,7 +105,7 @@ namespace PeachFarmerClient
             SavePullHistory(pullHistory, destinationFolder);
         }
 
-        private static NetworkClientConnection CreateNetworkConnection(string host, int listenPort, string serverCertFile, string clientCertFile)
+        private NetworkClientConnection CreateNetworkConnection(string host, int listenPort, string serverCertFile, string clientCertFile)
         {
             if (serverCertFile != null)
             {
@@ -112,12 +117,12 @@ namespace PeachFarmerClient
             }
         }
 
-        private static string GetPullHistoryPath(string destinationFolder)
+        private string GetPullHistoryPath(string destinationFolder)
         {
             return Path.Combine(destinationFolder, ".peachfarmerhistory.dat");
         }
 
-        private static PullHistory GetPullHistory(string destinationFolder)
+        private PullHistory GetPullHistory(string destinationFolder)
         {
             PullHistory pullHistory;
 
@@ -136,7 +141,7 @@ namespace PeachFarmerClient
             return pullHistory;
         }
 
-        private static void SavePullHistory(PullHistory pullHistory, string destinationFolder)
+        private void SavePullHistory(PullHistory pullHistory, string destinationFolder)
         {
             string filePath = GetPullHistoryPath(destinationFolder);
             using (Stream pullHistoryStream = File.OpenWrite(filePath))
