@@ -7,6 +7,8 @@ using System.IO;
 using System.Collections.Generic;
 using PeachFarmerTest.MockObjects;
 using PeachFarmerTest;
+using PeachFarmerLib.Messages;
+using RemoteHarvesterTest.TestStreams;
 
 namespace RemoteHarvesterTest
 {
@@ -15,26 +17,42 @@ namespace RemoteHarvesterTest
     {
         const string CorrectPassword = "the_r1ght_passw0rd";
 
+        private BookmarkableStream ClientRequestToStream(ReadRequestMessage requestMessage)
+        {
+            BookmarkableStream requestStream = new BookmarkableStream();
+            FarmerMessageSerializer serializer = new FarmerMessageSerializer();
+            serializer.Serialize(requestStream, requestMessage);
+            
+            requestStream.SetBookmark();
+            requestStream.Seek(0, SeekOrigin.Begin);
+
+            return requestStream;
+        }
+
         private void VerifyMonitoring(DateTime startTimestampExpected, byte[] folderDataExpected)
         {
-            MockDataConnection mockDataConnection = new MockDataConnection();
             MockFolderPackager mockFolderPackager = new MockFolderPackager();
             MockClock serverClock = new MockClock(new DateTime(2007, 5, 25, 15, 27, 03));
 
-            //
-            // All that the server expects from the client is a read request byte and a minimum
-            // modification timestamp.
-            //
+            ReadRequestMessage readRequest = new ReadRequestMessage();
+            readRequest.LastCheckTimeUtc = startTimestampExpected;
+            readRequest.ServerPassword = CorrectPassword;
 
-            mockDataConnection.BytesToReceiveQueue.Add(PeachFarmerProtocol.ReadRequest);
-            mockDataConnection.DateTimesToReceiveQueue.Add(startTimestampExpected);
-            mockDataConnection.StringsToReceiveQueue.Add(CorrectPassword);
+            using (BookmarkableStream clientStream = ClientRequestToStream(readRequest))
+            {
+                MockNetworkConnection networkConnection = new MockNetworkConnection(clientStream);
+                FolderMonitor folderMonitor = new FolderMonitor(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", CorrectPassword);
+                folderMonitor.ProcessNextRequest();
+                Assert.AreEqual(@"c:\fakepath\fakedir", mockFolderPackager.LastFolderPacked);
+                Assert.AreEqual(startTimestampExpected, mockFolderPackager.LastModifiedMinimumRequested);
 
-            FolderMonitor folderMonitor = new FolderMonitor(mockDataConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", CorrectPassword);
-            folderMonitor.ProcessNextRequest();
-            Assert.AreEqual(@"c:\fakepath\fakedir", mockFolderPackager.LastFolderPacked);
-            Assert.AreEqual(startTimestampExpected, mockFolderPackager.LastModifiedMinimumRequested);
-            Assert.IsTrue(Util.ArraysEqual<byte>(folderDataExpected, mockDataConnection.ByteArraysSentQueue[0]));
+                clientStream.ResetToBookmark();
+                FarmerMessageSerializer deserializer = new FarmerMessageSerializer();
+                ReadResponseMessage response = (ReadResponseMessage)deserializer.Deserialize(clientStream);
+
+                Assert.AreEqual(serverClock.GetCurrentTimeUtc(), response.CurrentServerTimeUtc);
+                Assert.IsTrue(Util.ArraysEqual<byte>(folderDataExpected, response.Data));
+            }
         }
 
         [TestMethod]
@@ -46,35 +64,33 @@ namespace RemoteHarvesterTest
 
         private void VerifyPasswordResult(string correctPassword, string suppliedPassword, bool expectPasswordIsCorrect)
         {
-            MockDataConnection mockDataConnection = new MockDataConnection();
-            MockFolderPackager mockFolderPackager = new MockFolderPackager();
-            MockClock serverClock = new MockClock(new DateTime(2007, 5, 25, 15, 27, 03));
+            ReadRequestMessage readRequest = new ReadRequestMessage();
+            readRequest.ServerPassword = suppliedPassword;
 
-            //
-            // All that the server expects from the client is a read request byte and a minimum
-            // modification timestamp.
-            //
-
-            mockDataConnection.BytesToReceiveQueue.Add(PeachFarmerProtocol.ReadRequest);
-            mockDataConnection.DateTimesToReceiveQueue.Add(new DateTime(0));
-            mockDataConnection.StringsToReceiveQueue.Add(suppliedPassword);
-
-            FolderMonitor folderMonitor = new FolderMonitor(mockDataConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", correctPassword);
-            folderMonitor.ProcessNextRequest();
-
-            if (expectPasswordIsCorrect)
+            using (BookmarkableStream clientStream = ClientRequestToStream(readRequest))
             {
-                Assert.AreEqual(PeachFarmerProtocol.PasswordCorrect, mockDataConnection.BytesSentQueue[0]);
-                Assert.IsTrue(mockDataConnection.ByteArraysSentQueue.Count > 0);
-            }
-            else
-            {
-                //
-                // If password is incorrect, verify no data is sent to the client
-                //
+                MockNetworkConnection networkConnection = new MockNetworkConnection(clientStream);
+                MockFolderPackager mockFolderPackager = new MockFolderPackager();
+                MockClock serverClock = new MockClock(new DateTime(2007, 5, 25, 15, 27, 03));
 
-                Assert.AreEqual(PeachFarmerProtocol.PasswordIncorrect, mockDataConnection.BytesSentQueue[0]);
-                Assert.AreEqual(0, mockDataConnection.ByteArraysSentQueue.Count);
+                FolderMonitor folderMonitor = new FolderMonitor(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", correctPassword);
+                folderMonitor.ProcessNextRequest();
+
+                clientStream.ResetToBookmark();
+                FarmerMessageSerializer deserializer = new FarmerMessageSerializer();
+                ReadResponseMessage readResponse = (ReadResponseMessage)deserializer.Deserialize(clientStream);
+
+                Assert.AreEqual(expectPasswordIsCorrect, readResponse.IsPasswordCorrect);
+
+                if (expectPasswordIsCorrect)
+                {
+                    Assert.AreEqual(serverClock.GetCurrentTimeUtc(), readResponse.CurrentServerTimeUtc);
+                    Assert.IsNotNull(readResponse.Data);
+                }
+                else
+                {
+                    Assert.IsNull(readResponse.Data);
+                }
             }
         }
 

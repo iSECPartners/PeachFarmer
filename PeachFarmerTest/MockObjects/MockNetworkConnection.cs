@@ -11,49 +11,26 @@ namespace PeachFarmerTest.MockObjects
 {
     class MockNetworkConnection : INetworkConnection
     {
-        private byte[] _readQueue;
-        private int _readQueuePosition;
+        private Stream _stream;
 
-        private MemoryStream _writtenData;
-
-        public byte[] WrittenBytes
+        public MockNetworkConnection(Stream stream)
         {
-            get
-            {
-                return _writtenData.ToArray();
-            }
+            _stream = stream;
         }
 
-        public MockNetworkConnection(byte[] readQueue)
+        public Stream GetStream()
         {
-            _readQueue = readQueue;
-            _readQueuePosition = 0;
-            _writtenData = new MemoryStream();
-        }
-
-        public byte[] ReadBytes(int length)
-        {
-            byte[] readBuffer = new byte[length];
-
-            Array.Copy(_readQueue, _readQueuePosition, readBuffer, 0, length);
-            _readQueuePosition += length;
-
-            return readBuffer;
-        }
-
-        public void WriteBytes(byte[] data)
-        {
-            _writtenData.Write(data, 0, data.Length);
+            return _stream;
         }
 
         public void Close()
         {
-            ;
+            _stream.Close();
         }
 
         public void Dispose()
         {
-            _writtenData.Dispose();
+            ;
         }
     }
 }

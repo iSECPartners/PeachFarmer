@@ -39,15 +39,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FarmerMessageSerializer.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="Framework\IDataConnection.cs" />
+    <Compile Include="Framework\IFarmerNetworkMessage.cs" />
     <Compile Include="Framework\IFileSystem.cs" />
     <Compile Include="Framework\IFolderPackager.cs" />
     <Compile Include="Framework\IFolderUnpacker.cs" />
     <Compile Include="Framework\INetworkConnection.cs" />
     <Compile Include="Framework\IPullHistory.cs" />
+    <Compile Include="Messages\ReadRequestMessage.cs" />
+    <Compile Include="Messages\ReadResponseMessage.cs" />
     <Compile Include="NetworkConnectionBase.cs" />
-    <Compile Include="DataConnection.cs" />
     <Compile Include="PeachFarmerProtocol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -2,6 +2,7 @@
 using PeachFarmerLib.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -21,7 +22,7 @@ namespace RemoteHarvester
             _tcpClient = null;
         }
 
-        public override byte[] ReadBytes(int length)
+        public override Stream GetStream()
         {
             if (_tcpClient == null)
             {
@@ -33,7 +34,8 @@ namespace RemoteHarvester
                 _tcpClient = _tcpListener.AcceptTcpClient();
             }
 
-            return base.ReadBytes(length);
+            return base.GetStream();
         }
+
     }
 }

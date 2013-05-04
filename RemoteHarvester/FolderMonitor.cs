@@ -1,8 +1,11 @@
 ﻿using PeachFarmerLib;
 using PeachFarmerLib.Framework;
+using PeachFarmerLib.Messages;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,7 +13,9 @@ namespace RemoteHarvester
 {
     public class FolderMonitor
     {
-        private IDataConnection _dataConnection;
+        private INetworkConnection _serverConnection;
+
+        private Stream _clientStream;
 
         private IFolderPacker _folderPackager;
 
@@ -20,9 +25,9 @@ namespace RemoteHarvester
 
         private byte[] _correctPasswordHash;
 
-        public FolderMonitor(IDataConnection networkConnection, IFolderPacker folderPackager, IClock clock, string folderPath, string password)
+        public FolderMonitor(INetworkConnection serverConnection, IFolderPacker folderPackager, IClock clock, string folderPath, string password)
         {
-            _dataConnection = networkConnection;
+            _serverConnection = serverConnection;
             _folderPackager = folderPackager;
             _clock = clock;
             _folderPath = folderPath;
@@ -50,37 +55,27 @@ namespace RemoteHarvester
                     Console.WriteLine("Exception processing message: {0}\r\n{1}", ex.Message, ex.StackTrace.ToString());
                 }
 
-                _dataConnection.Close();
+                _serverConnection.Close();
             }
         }
 
         public void ProcessNextRequest()
         {
-            byte requestType = _dataConnection.ReceiveByte();
+            _clientStream = _serverConnection.GetStream();
+            IFarmerNetworkMessage request = ReceiveRequest();
 
-            if (!IsPasswordValid())
-            {
-                Console.WriteLine("Rejecting connection. Invalid password.");
-                _dataConnection.SendByte(PeachFarmerProtocol.PasswordIncorrect);
-                return;
-            }
-
-            _dataConnection.SendByte(PeachFarmerProtocol.PasswordCorrect);
-
-            switch (requestType)
+            switch (request.MessageType)
             {
                 case PeachFarmerProtocol.ReadRequest:
-                    ProcessReadRequest();
+                    ProcessReadRequest((ReadRequestMessage)request);
                     break;
                 default:
-                    throw new ArgumentException(string.Format("Unrecognized request type: 0x{0:X2}", requestType));
+                    throw new ArgumentException(string.Format("Unrecognized request type: 0x{0:X2}", request.MessageType));
             }
         }
 
-        private bool IsPasswordValid()
+        private bool IsPasswordValid(string sentPassword)
         {
-            const int MaxPasswordLength = 128;
-            string sentPassword = _dataConnection.ReceiveString(MaxPasswordLength);
             if (_correctPasswordHash == null)
             {
                 return true;
@@ -104,24 +99,39 @@ namespace RemoteHarvester
             return true;
         }
 
-        private void ProcessReadRequest()
+        private void ProcessReadRequest(ReadRequestMessage request)
         {
             Console.WriteLine("ReadRequest from client at {0}", DateTime.Now);
 
-            DateTime minModifiedTimeUtc = _dataConnection.ReceiveDateTime();
+            ReadResponseMessage response = new ReadResponseMessage();
+            response.IsPasswordCorrect = IsPasswordValid(request.ServerPassword);
+            if (!response.IsPasswordCorrect)
+            {
+                Console.WriteLine("Rejecting connection. Invalid password.");
+                SendResponse(response);
+                return;
+            }
 
-            _dataConnection.SendDateTime(_clock.GetCurrentTimeUtc());
+            response.CurrentServerTimeUtc = _clock.GetCurrentTimeUtc();
+            response.Data = _folderPackager.PackFolder(_folderPath, request.LastCheckTimeUtc);
 
-            byte[] folderBytes = _folderPackager.PackFolder(_folderPath, minModifiedTimeUtc);
+            Console.WriteLine("Sending {0} bytes.", response.Data.Length);
 
-            byte[] folderBytesLength = BitConverter.GetBytes(folderBytes.Length);
+            SendResponse(response);
 
-            Console.WriteLine("Sending package length: {0} bytes", folderBytes.Length);
-            _dataConnection.SendInt(folderBytes.Length);
-
-            Console.WriteLine("Sending package bytes...");
-            _dataConnection.SendBytes(folderBytes);
             Console.WriteLine("Done!");
+        }
+
+        private IFarmerNetworkMessage ReceiveRequest()
+        {
+            FarmerMessageSerializer deserializer = new FarmerMessageSerializer();
+            return deserializer.Deserialize(_clientStream);
+        }
+
+        private void SendResponse(IFarmerNetworkMessage response)
+        {
+            FarmerMessageSerializer serializer = new FarmerMessageSerializer();
+            serializer.Serialize(_clientStream, response);
         }
     }
 }

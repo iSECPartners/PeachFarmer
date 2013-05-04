@@ -15,11 +15,10 @@ namespace PeachFarmerLib
         public const byte ReadRequest = 0x0a;
 
         //
-        // Server Response  Codes
+        // Server Message Codes
         //
 
-        public const byte PasswordIncorrect     = 0x10;
-        public const byte PasswordCorrect       = 0x11;
+        public const byte ReadResponse = 0x8a;
 
         public const int FarmerPort = 8123;
     }

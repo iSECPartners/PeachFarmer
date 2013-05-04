@@ -31,7 +31,7 @@ namespace PeachFarmerClient
             _sslStream = null;
         }
 
-        protected override Stream GetStream()
+        public override Stream GetStream()
         {
             if (_sslStream == null)
             {

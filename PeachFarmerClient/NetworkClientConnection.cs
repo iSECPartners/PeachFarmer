@@ -2,6 +2,7 @@
 using PeachFarmerLib.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -52,18 +53,11 @@ namespace PeachFarmerClient
             }
         }
 
-        public override byte[] ReadBytes(int length)
+        public override Stream GetStream()
         {
             EnsureConnected();
 
-            return base.ReadBytes(length);
-        }
-
-        public override void WriteBytes(byte[] data)
-        {
-            EnsureConnected();
-
-            base.WriteBytes(data);
+            return base.GetStream();
         }
     }
 }

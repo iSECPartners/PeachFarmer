@@ -95,11 +95,8 @@ namespace PeachFarmerClient
 
             using (NetworkClientConnection networkConnection = CreateNetworkConnection(workerHost, PeachFarmerProtocol.FarmerPort, serverCertFile, clientCertFile))
             {
-                using (DataConnection dataConnection = new DataConnection(networkConnection))
-                {
-                    FilePuller filePuller = new FilePuller(dataConnection, unpacker, pullHistory, password);
-                    filePuller.Pull(workerHost, destinationFolder);
-                }
+                FilePuller filePuller = new FilePuller(networkConnection.GetStream(), unpacker, pullHistory, password);
+                filePuller.Pull(workerHost, destinationFolder);
             }
 
             SavePullHistory(pullHistory, destinationFolder);

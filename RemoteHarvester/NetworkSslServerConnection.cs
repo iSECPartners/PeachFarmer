@@ -34,7 +34,7 @@ namespace RemoteHarvester
             _sslStream = null;
         }
 
-        protected override Stream GetStream()
+        public override Stream GetStream()
         {
             if (_sslStream == null)
             {
@@ -50,6 +50,11 @@ namespace RemoteHarvester
 
         public bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
+            if (_pinnedClientCert == null)
+            {
+                return true;
+            }
+
             if ((sslPolicyErrors == SslPolicyErrors.RemoteCertificateChainErrors) && (_pinnedClientCert != null))
             {
                 return _pinnedClientCert.GetCertHashString().Equals(certificate.GetCertHashString());

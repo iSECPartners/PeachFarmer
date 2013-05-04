@@ -1,7 +1,9 @@
 ﻿using PeachFarmerLib;
 using PeachFarmerLib.Framework;
+using PeachFarmerLib.Messages;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +12,7 @@ namespace PeachFarmerClient
 {
     public class FilePuller
     {
-        private IDataConnection _dataConnection;
+        private Stream _serverStream;
 
         private IFolderUnpacker _folderUnpacker;
 
@@ -18,9 +20,9 @@ namespace PeachFarmerClient
 
         private string _serverPassword;
 
-        public FilePuller(IDataConnection dataConection, IFolderUnpacker folderUnpacker, IPullHistory pullHistory, string serverPassword)
+        public FilePuller(Stream serverStream, IFolderUnpacker folderUnpacker, IPullHistory pullHistory, string serverPassword)
         {
-            _dataConnection = dataConection;
+            _serverStream = serverStream;
 
             _folderUnpacker = folderUnpacker;
 
@@ -31,30 +33,25 @@ namespace PeachFarmerClient
 
         public void Pull(string workerName, string destinationFolder)
         {
-            _dataConnection.SendByte(PeachFarmerProtocol.ReadRequest);
+            ReadRequestMessage readRequest = new ReadRequestMessage();
+            readRequest.LastCheckTimeUtc = _pullHistory.GetLastPullTime(workerName);
+            readRequest.ServerPassword = _serverPassword;
 
-            _dataConnection.SendString(_serverPassword);
-            if (_dataConnection.ReceiveByte() != PeachFarmerProtocol.PasswordCorrect)
+            FarmerMessageSerializer messageSerializer = new FarmerMessageSerializer();
+            messageSerializer.Serialize(_serverStream, readRequest);
+
+            ReadResponseMessage readResponse = (ReadResponseMessage)messageSerializer.Deserialize(_serverStream);
+            if (!readResponse.IsPasswordCorrect)
             {
                 Console.WriteLine("Error: Incorrect password.");
                 return;
             }
 
-            DateTime modifiedAfterUtc = _pullHistory.GetLastPullTime(workerName);
-            Console.WriteLine("Requesting files modified after {0}", modifiedAfterUtc.ToLocalTime());
-            _dataConnection.SendDateTime(modifiedAfterUtc);
+            Console.WriteLine("Server check time was {0}", readResponse.CurrentServerTimeUtc.ToLocalTime());
+            Console.WriteLine("Read {0} bytes", readResponse.Data.Length);
 
-            DateTime checkTimeUtc = _dataConnection.ReceiveDateTime();
-            Console.WriteLine("Server check time was {0}", checkTimeUtc.ToLocalTime());
-
-            int dataLength = _dataConnection.ReceiveInt();
-            Console.WriteLine("Data length is {0}", dataLength);
-
-            byte[] packageData = _dataConnection.ReceiveBytes(dataLength);
-            Console.WriteLine("Read {0} bytes", packageData.Length);
-
-            _folderUnpacker.UnpackFolder(destinationFolder, packageData);
-            _pullHistory.SetLastPullTime(workerName, checkTimeUtc);
+            _folderUnpacker.UnpackFolder(destinationFolder, readResponse.Data);
+            _pullHistory.SetLastPullTime(workerName, readResponse.CurrentServerTimeUtc);
         }
     }
 }

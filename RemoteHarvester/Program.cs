@@ -32,12 +32,9 @@ namespace RemoteHarvester
 
             using (NetworkServerConnection tcpServer = CreateNetworkConnection(listenPort, serverCertFile, clientCertFile))
             {
-                using (DataConnection dataConnection = new DataConnection(tcpServer))
-                {
-                    FolderMonitor folderMontior = new FolderMonitor(dataConnection, packager, new Clock(), folderPath, connectionPassword);
+                FolderMonitor folderMontior = new FolderMonitor(tcpServer, packager, new Clock(), folderPath, connectionPassword);
 
-                    folderMontior.Monitor();
-                }
+                folderMontior.Monitor();
             }
         }
 
