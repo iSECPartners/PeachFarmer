@@ -8,6 +8,11 @@ namespace PeachFarmerTest
 {
     static class Util
     {
+        public static bool ListsEqual<T>(List<T> list1, List<T> list2)
+        {
+            return ArraysEqual(list1.ToArray(), list2.ToArray());
+        }
+
         public static bool ArraysEqual<T>(T[] array1, T[] array2)
         {
             if (array1.Length != array2.Length)

@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="TargetFileParserTest.cs" />
     <Compile Include="FolderMonitorTest.cs" />
     <Compile Include="MockObjects\MockClock.cs" />
     <Compile Include="MockObjects\MockDataConnection.cs" />
