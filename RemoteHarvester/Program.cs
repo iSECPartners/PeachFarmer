@@ -19,6 +19,14 @@ namespace RemoteHarvester
             CommandLineOptions options = new CommandLineOptions();
             if (CommandLine.Parser.Default.ParseArguments(args, options))
             {
+                string usageError;
+                if (!options.Validate(out usageError))
+                {
+                    Console.WriteLine(options.GetUsage());
+                    Console.WriteLine("Error: " + usageError);
+                    return;
+                }
+
                 if (options.Password != null && options.ServerCertFile == null)
                 {
                     ShowPlaintextPasswordWarning();

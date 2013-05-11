@@ -23,11 +23,11 @@ namespace PeachFarmerClient
             CommandLineOptions options = new CommandLineOptions();
             if (CommandLine.Parser.Default.ParseArguments(args, options))
             {
-                string valiationError = options.GetValidationError();
-                if (valiationError != null)
+                string usageError;
+                if (!options.Validate(out usageError))
                 {
                     Console.WriteLine(options.GetUsage());
-                    Console.WriteLine(valiationError);
+                    Console.WriteLine("Error: " + usageError);
                     return;
                 }
 

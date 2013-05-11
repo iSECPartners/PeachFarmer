@@ -60,14 +60,21 @@ namespace PeachFarmerClient
               (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
         }
 
-        public string GetValidationError()
+        public bool Validate(out string errorMessage)
         {
             if ((WorkerHost == null) && (WorkerHostFile == null))
             {
-                return "Must enter a target host or file of target hosts.";
+                errorMessage = "Must enter a target host or file of target hosts.";
+                return false;
+            }
+            else if ((ClientCertFile != null) && (ServerCertFile == null))
+            {
+                errorMessage = "Cannot specify a client certificate without a server certificate.";
+                return false;
             }
 
-            return null;
+            errorMessage = null;
+            return true;
         }
     }
 }

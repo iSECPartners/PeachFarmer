@@ -51,5 +51,17 @@ namespace RemoteHarvester
             return HelpText.AutoBuild(this,
               (HelpText current) => HelpText.DefaultParsingErrorsHandler(this, current));
         }
+
+        public bool Validate(out string errorMessage)
+        {
+            if ((ClientCertFile != null) && (ServerCertFile == null))
+            {
+                errorMessage = "Cannot specify a client certificate without a server certificate.";
+                return false;
+            }
+
+            errorMessage = null;
+            return true;
+        }
     }
 }
