@@ -19,8 +19,20 @@ namespace RemoteHarvester
             CommandLineOptions options = new CommandLineOptions();
             if (CommandLine.Parser.Default.ParseArguments(args, options))
             {
+                if (options.Password != null && options.ServerCertFile == null)
+                {
+                    ShowPlaintextPasswordWarning();
+                }
+
                 DoMonitorFolder(options.LogFolder, PeachFarmerProtocol.FarmerPort, options.Password, options.ServerCertFile, options.ClientCertFile);
             }
+        }
+
+        private static void ShowPlaintextPasswordWarning()
+        {
+            Console.WriteLine("Warning: Server password is required but SSL is not enabled. Passwords will be sent in plaintext.\r\n" +
+                              "Use the --server-cert parameter to enable SSL so that passwords are sent in an encrypted SSL tunnel.");
+            Console.WriteLine();
         }
 
         private static void DoMonitorFolder(string folderPath, int listenPort, string connectionPassword, string serverCertFile, string clientCertFile)
