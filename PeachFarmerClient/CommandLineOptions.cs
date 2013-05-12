@@ -12,7 +12,7 @@ namespace PeachFarmerClient
     {
         private string _destinationFolder;
 
-        [Option('h', "host", MutuallyExclusiveSet = "targets",
+        [Option('t', "targetHost", MutuallyExclusiveSet = "targets",
                 HelpText = "Hostname of worker to query.")]
         public string WorkerHost { get; set; }
 
