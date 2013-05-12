@@ -35,7 +35,7 @@ namespace PeachFarmerTest.MockObjects
 
         public bool Equals(MockFile other)
         {
-            if (!this.Filename.Equals(other.Filename))
+            if (string.CompareOrdinal(this.Filename, other.Filename) != 0)
             {
                 return false;
             }

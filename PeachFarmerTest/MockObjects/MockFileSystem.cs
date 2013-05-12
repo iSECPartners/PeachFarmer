@@ -40,7 +40,7 @@ namespace PeachFarmerTest.MockObjects
                     continue;
                 }
 
-                if (filename.StartsWith(directoryPath))
+                if (filename.StartsWith(directoryPath, StringComparison.InvariantCulture))
                 {
                     directoryFiles.Add(filename);
                 }

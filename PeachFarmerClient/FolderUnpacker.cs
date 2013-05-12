@@ -62,7 +62,7 @@ namespace PeachFarmerClient
 
             string fullPath = Path.GetFullPath(combinedPath);
 
-            if (!fullPath.StartsWith(destinationFolder))
+            if (!fullPath.StartsWith(destinationFolder, StringComparison.InvariantCulture))
             {
                 throw new ArgumentException("Invalid package path. Package files must not be located outside of root directory.");
             }

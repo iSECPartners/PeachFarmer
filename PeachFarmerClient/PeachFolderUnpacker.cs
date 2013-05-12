@@ -21,7 +21,8 @@ namespace PeachFarmerClient
 
         protected override string GenerateExtractedFilename(string destinationFolder, string packagePath)
         {
-            if (packagePath.Equals("status.txt") || packagePath.EndsWith(Path.DirectorySeparatorChar + "status.txt"))
+            if ((string.CompareOrdinal(packagePath, "status.txt") == 0) || 
+                packagePath.EndsWith(Path.DirectorySeparatorChar + "status.txt", StringComparison.InvariantCulture))
             {
                 string adjustedPackagePath = string.Format("status-{0}.txt", _disambiguatorName);
 

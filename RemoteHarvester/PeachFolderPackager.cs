@@ -33,7 +33,7 @@ namespace RemoteHarvester
                     foreach (string logDirectory in logDirectories)
                     {
                         bool isLatest;
-                        if (logDirectory.Equals(latestLogDirectory))
+                        if (string.CompareOrdinal(logDirectory, latestLogDirectory) == 0)
                         {
                             isLatest = true;
                         }
@@ -65,7 +65,7 @@ namespace RemoteHarvester
                 {
                     continue;
                 }
-                if (!includeStatusFile && filename.EndsWith(Path.DirectorySeparatorChar + "status.txt"))
+                if (!includeStatusFile && filename.EndsWith(Path.DirectorySeparatorChar + "status.txt", StringComparison.InvariantCulture))
                 {
                     continue;
                 }
@@ -84,7 +84,7 @@ namespace RemoteHarvester
         private void PackFile(string folderRoot, string filename, ZipArchive zipArchive)
         {
             string zipEntryName = filename.Substring(folderRoot.Length);
-            if (zipEntryName.StartsWith(Path.DirectorySeparatorChar.ToString()))
+            if (zipEntryName.StartsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.InvariantCulture))
             {
                 zipEntryName = zipEntryName.Substring(1);
             }

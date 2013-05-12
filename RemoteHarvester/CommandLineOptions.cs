@@ -23,7 +23,7 @@ namespace RemoteHarvester
             set
             {
                 _logFolder = value;
-                if (!_logFolder.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
+                if (!_logFolder.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString(), StringComparison.InvariantCulture))
                 {
                     _logFolder += System.IO.Path.DirectorySeparatorChar;
                 }

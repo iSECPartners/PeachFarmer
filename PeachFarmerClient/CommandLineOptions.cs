@@ -31,7 +31,7 @@ namespace PeachFarmerClient
             set
             {
                 _destinationFolder = value;
-                if (!_destinationFolder.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()))
+                if (!_destinationFolder.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString(), StringComparison.InvariantCulture))
                 {
                     _destinationFolder += System.IO.Path.DirectorySeparatorChar;
                 }
