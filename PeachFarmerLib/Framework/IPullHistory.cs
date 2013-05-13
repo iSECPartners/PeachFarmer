@@ -11,5 +11,9 @@ namespace PeachFarmerLib.Framework
         DateTime GetLastPullTime(string workerHost);
 
         void SetLastPullTime(string workerHost, DateTime utcTime);
+
+        void Save();
+
+        void Load();
     }
 }

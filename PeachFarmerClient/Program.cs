@@ -91,7 +91,8 @@ namespace PeachFarmerClient
             Console.WriteLine("Pulling files from {0}", workerHost);
 
             PeachFolderUnpacker unpacker = new PeachFolderUnpacker(new FileSystem(), workerHost);
-            PullHistory pullHistory = GetPullHistory(destinationFolder);
+            PullHistory pullHistory = new PullHistory(new FileSystem(), GetPullHistoryPath(destinationFolder));
+            pullHistory.Load();
 
             using (NetworkClientConnection networkConnection = CreateNetworkConnection(workerHost, PeachFarmerProtocol.FarmerPort, serverCertFile, clientCertFile))
             {
@@ -99,7 +100,7 @@ namespace PeachFarmerClient
                 filePuller.Pull(workerHost, destinationFolder);
             }
 
-            SavePullHistory(pullHistory, destinationFolder);
+            pullHistory.Save();
         }
 
         private NetworkClientConnection CreateNetworkConnection(string host, int listenPort, string serverCertFile, string clientCertFile)
@@ -117,35 +118,6 @@ namespace PeachFarmerClient
         private string GetPullHistoryPath(string destinationFolder)
         {
             return Path.Combine(destinationFolder, ".peachfarmerhistory.dat");
-        }
-
-        private PullHistory GetPullHistory(string destinationFolder)
-        {
-            PullHistory pullHistory;
-
-            string filePath = GetPullHistoryPath(destinationFolder);
-            if (!File.Exists(filePath))
-            {
-                return new PullHistory();
-            }
-
-            using (Stream pullHistoryStream = File.OpenRead(filePath))
-            {
-                BinaryFormatter deserializer = new BinaryFormatter();
-                pullHistory = (PullHistory)deserializer.Deserialize(pullHistoryStream);
-            }
-
-            return pullHistory;
-        }
-
-        private void SavePullHistory(PullHistory pullHistory, string destinationFolder)
-        {
-            string filePath = GetPullHistoryPath(destinationFolder);
-            using (Stream pullHistoryStream = File.OpenWrite(filePath))
-            {
-                BinaryFormatter serializer = new BinaryFormatter();
-                serializer.Serialize(pullHistoryStream, pullHistory);
-            }
         }
     }
 }

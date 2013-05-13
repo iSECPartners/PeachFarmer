@@ -34,7 +34,7 @@ namespace PeachFarmerClientTest
             readResponse.Data = new byte[] { 0xaa, 0xbb };
 
             MockFolderUnpacker folderUnpacker = new MockFolderUnpacker();
-            PullHistory pullHistory = new PullHistory();
+            PullHistory pullHistory = new PullHistory(null, null);
 
             using (Stream responseStream = ServerResponseToStream(readResponse))
             {
@@ -63,7 +63,7 @@ namespace PeachFarmerClientTest
             using (Stream responseStream = ServerResponseToStream(serverResponseMessage))
             {
                 MockFolderUnpacker folderUnpacker = new MockFolderUnpacker();
-                PullHistory pullHistory = new PullHistory();
+                PullHistory pullHistory = new PullHistory(null, null);
 
                 FilePuller filePuller = new FilePuller(responseStream, folderUnpacker, pullHistory, "the_wr0ng_passw0rd");
                 filePuller.Pull("dummyhost", @"c:\fakedestination");
