@@ -62,7 +62,14 @@ namespace RemoteHarvester
         {
             if (serverCertFile != null)
             {
-                return new NetworkSslServerConnection(listenPort, ConnectionTimeout, serverCertFile, clientCertFile);
+                byte[] serverCertData = File.ReadAllBytes(serverCertFile);
+                byte[] clientCertData = null;
+                if (clientCertFile != null)
+                {
+                    clientCertData = File.ReadAllBytes(clientCertFile);
+                }
+
+                return new NetworkSslServerConnection(listenPort, ConnectionTimeout, serverCertData, clientCertData);
             }
             else
             {

@@ -19,13 +19,13 @@ namespace RemoteHarvester
 
         private X509Certificate2 _pinnedClientCert;
 
-        public NetworkSslServerConnection(int port, int timeout, string serverCertFile, string clientCertFile)
+        public NetworkSslServerConnection(int port, int timeout, byte[] serverCertData, byte[] clientCertData)
             :base(port, timeout)
         {
-            _serverCert = new X509Certificate2(serverCertFile);
-            if (clientCertFile != null)
+            _serverCert = new X509Certificate2(serverCertData);
+            if (clientCertData != null)
             {
-                _pinnedClientCert = new X509Certificate2(clientCertFile);
+                _pinnedClientCert = new X509Certificate2(clientCertData);
             }
             else
             {
