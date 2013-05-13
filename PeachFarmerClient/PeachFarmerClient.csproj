@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandLineOptions.cs" />
+    <Compile Include="CommandProcessor.cs" />
     <Compile Include="FilePuller.cs" />
     <Compile Include="FolderUnpacker.cs" />
     <Compile Include="NetworkClientConnection.cs" />

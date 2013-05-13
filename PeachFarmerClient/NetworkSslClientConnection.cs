@@ -16,13 +16,13 @@ namespace PeachFarmerClient
         private X509Certificate2 _clientCert;
         private SslStream _sslStream;
 
-        public NetworkSslClientConnection(string host, int port, int timeout, string serverCertFile, string clientCertFile)
+        public NetworkSslClientConnection(string host, int port, int timeout, byte[] serverCertData, byte[] clientCertData)
             :base(host, port, timeout)
         {
-            _serverCert = new X509Certificate2(serverCertFile);
-            if (clientCertFile != null)
+            _serverCert = new X509Certificate2(serverCertData);
+            if (clientCertData != null)
             {
-                _clientCert = new X509Certificate2(clientCertFile);
+                _clientCert = new X509Certificate2(clientCertData);
             }
             else
             {
