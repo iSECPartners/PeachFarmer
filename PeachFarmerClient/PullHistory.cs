@@ -29,6 +29,8 @@ namespace PeachFarmerClient
 
         public DateTime GetLastPullTime(string workerHost)
         {
+            Load();
+
             try
             {
                 return _lastPullTimes[workerHost];
@@ -49,9 +51,11 @@ namespace PeachFarmerClient
             {
                 _lastPullTimes.Add(workerHost, utcTime);
             }
+
+            Save();
         }
 
-        public void Save()
+        private void Save()
         {
             using (Stream pullHistoryStream = _fileSystem.GetOutputStream(_filename))
             {
@@ -60,7 +64,7 @@ namespace PeachFarmerClient
             }
         }
 
-        public void Load()
+        private void Load()
         {
             if (_fileSystem.FileExists(_filename))
             {

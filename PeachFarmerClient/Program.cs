@@ -92,15 +92,12 @@ namespace PeachFarmerClient
 
             PeachFolderUnpacker unpacker = new PeachFolderUnpacker(new FileSystem(), workerHost);
             PullHistory pullHistory = new PullHistory(new FileSystem(), GetPullHistoryPath(destinationFolder));
-            pullHistory.Load();
 
             using (NetworkClientConnection networkConnection = CreateNetworkConnection(workerHost, PeachFarmerProtocol.FarmerPort, serverCertFile, clientCertFile))
             {
                 FilePuller filePuller = new FilePuller(networkConnection.GetStream(), unpacker, pullHistory, password);
                 filePuller.Pull(workerHost, destinationFolder);
             }
-
-            pullHistory.Save();
         }
 
         private NetworkClientConnection CreateNetworkConnection(string host, int listenPort, string serverCertFile, string clientCertFile)
