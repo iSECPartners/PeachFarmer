@@ -41,7 +41,6 @@
   <ItemGroup>
     <Compile Include="FarmerMessageSerializer.cs" />
     <Compile Include="FileSystem.cs" />
-    <Compile Include="Framework\IDataConnection.cs" />
     <Compile Include="Framework\IFarmerNetworkMessage.cs" />
     <Compile Include="Framework\IFileSystem.cs" />
     <Compile Include="Framework\IFolderPackager.cs" />
