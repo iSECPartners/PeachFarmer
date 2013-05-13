@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Clock.cs" />
     <Compile Include="CommandLineOptions.cs" />
+    <Compile Include="CommandProcessor.cs" />
     <Compile Include="FolderMonitor.cs" />
     <Compile Include="IClock.cs" />
     <Compile Include="NetworkSslServerConnection.cs" />
