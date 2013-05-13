@@ -21,18 +21,31 @@ namespace PeachFarmerLib
             _timeout = timeout;
         }
 
-        public virtual void Close()
+        ~NetworkConnectionBase()
         {
-            _tcpClient.Close();
-            _tcpClient = null;
+            Dispose(false);
         }
 
-        public void Dispose()
+        public virtual void Close()
         {
             if (_tcpClient != null)
             {
                 _tcpClient.Close();
                 _tcpClient = null;
+            }
+        }
+
+        void IDisposable.Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Close();
             }
         }
 
