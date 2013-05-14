@@ -30,8 +30,8 @@ namespace RemoteHarvester
                     ShowPlaintextPasswordWarning();
                 }
 
-                CommandProcessor processor = new CommandProcessor();
-                processor.Process(options);
+                CommandProcessor processor = new CommandProcessor(options);
+                processor.MonitorFolder();
             }
         }
 

@@ -10,21 +10,37 @@ namespace RemoteHarvester
 {
     public class CommandProcessor
     {
-        public void Process(CommandLineOptions options)
+        private string _folderPath;
+
+        private string _connectionPassword;
+
+        private string _serverCertFile;
+
+        private string _clientCertFile;
+
+        public CommandProcessor(CommandLineOptions options)
         {
-            DoMonitorFolder(options.LogFolder, PeachFarmerProtocol.FarmerPort, options.Password, options.ServerCertFile, options.ClientCertFile);
+            _folderPath = options.LogFolder;
+
+            _connectionPassword = options.Password;
+
+            _serverCertFile = options.ServerCertFile;
+
+            _clientCertFile = options.ClientCertFile;
         }
 
-        private void DoMonitorFolder(string folderPath, int listenPort, string connectionPassword, string serverCertFile, string clientCertFile)
+        public void MonitorFolder()
         {
-            Console.WriteLine("Starting log monitor on: {0}", folderPath);
+            int listenPort = PeachFarmerProtocol.FarmerPort;
+
+            Console.WriteLine("Starting log monitor on: {0}", _folderPath);
             Console.WriteLine("Listening for connections on port {0}", listenPort.ToString());
 
             PeachFolderPackager packager = new PeachFolderPackager(new FileSystem());
 
-            using (NetworkServerConnection tcpServer = CreateNetworkConnection(listenPort, serverCertFile, clientCertFile))
+            using (NetworkServerConnection tcpServer = CreateNetworkConnection(listenPort, _serverCertFile, _clientCertFile))
             {
-                FolderMonitor folderMontior = new FolderMonitor(tcpServer, packager, new Clock(), folderPath, connectionPassword);
+                FolderMonitor folderMontior = new FolderMonitor(tcpServer, packager, new Clock(), _folderPath, _connectionPassword);
 
                 folderMontior.Monitor();
             }
