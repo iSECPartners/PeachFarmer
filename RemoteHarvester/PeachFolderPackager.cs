@@ -65,6 +65,12 @@ namespace RemoteHarvester
                 {
                     continue;
                 }
+
+                //
+                // If PeachFarmer is monitoring the root of logging folder (i.e. a folder containing multiple runs of Peach logs),
+                // we collect the contents of every folder, but only take the status.txt file from the latest log output.
+                //
+
                 if (!includeStatusFile && filename.EndsWith(Path.DirectorySeparatorChar + "status.txt", StringComparison.InvariantCulture))
                 {
                     continue;
