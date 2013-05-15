@@ -1,73 +1,33 @@
 PeachFarmer
 ===========
 
-## What is It?
+PeachFarmer facilitates fuzz testing in the cloud. PeachFarmer is designed to be used in conjunction with the [Peach fuzzing framework](http://www.peachfuzzer.com). Peach allows the user to split up a fuzzing job among many machines, but does not offer a built-in way to gather the logs and crash dumps from all these separate machines. PeachFarmer offers a way for users to collect all of their fuzzing results both quickly and easily.
 
-PeachFarmer is a utility to collect log files from remote machines performing fuzz testing with the [Peach Fuzzing Framework](http://www.peachfuzzer.com).
+* __PeachFarmerClient__ - Runs on the user’s local machine and connects to each of the RemoteHarvester servers to retrieve the fuzzing output. The client then aggregates all of the files into a single location on the local machine.
 
-This is useful if you're running Peach instances on several AWS instances and you don't want to have to keep logging into each one to collect the logs and aggregate them manually.
+* __RemoteHarvester__ - A minimal server that runs on each of the remote fuzzing instances. It listens for connections and provides the client with any new log files the client does not already have.
 
-PeachFarmerClient - Runs on the user’s local machine and connects to each of the RemoteHarvester servers to retrieve the fuzzing output. The client then aggregates all of the files into a single location on the local machine.
-
-RemoteHarvester - A minimal server that runs on each of the remote fuzzing instances. It listens for connections and provides the client with any new log files the client does not already have.
-
-CertPairGenerator (Windows only) - Simple tool to create self-signed X509 certificates for PeachFarmer to use to communicate over SSL.
+* __CertPairGenerator__ (Windows only) - Simple tool to create self-signed X509 certificates for PeachFarmer to use to communicate over SSL.
 
 ## Binaries
 
 ### Windows
 
-[PeachFarmer v1.0](https://s3.amazonaws.com/PeachFarmer/v1.0/PeachFarmer.zip)
-(MD5: c6c43295568de92a2c0529810e8f7f77)
+[PeachFarmer v1.0](https://s3.amazonaws.com/PeachFarmer/v1.0/PeachFarmer.zip)  
+(MD5: c6c43295568de92a2c0529810e8f7f77)  
 (SHA-256: b5179103735e6a062fc1bbf2e4ab8f24fe0351e1e0338670a7a3b32faa2d0abe)
 
 ### Linux / OS X
 
 Coming soon!
 
+## Usage
+
+See [Usage Instructions](https://github.com/iSECPartners/PeachFarmer/wiki/Usage-Instructions)
+
 ## Requirements
 
 Requires the .NET Framework v. 4.5
-
-## QuickStart
-
-### Simple Usage
-
-On the remote machine (IP adddress=192.168.1.101), launch RemoteHarvester and specify the Peach log folder:
-
-<pre>RemoteHarvester -d c:\peachlogs\</pre>
-
-On the local machine, specify the remote machine and the aggregate log folder in which to collect log files:
-
-<pre>PeachFarmerClient -t 192.168.1.101 -d c:\aggregatedlogs\</pre>
-
-### Pulling from Multiple Machines
-
-To collect files from multiple Peach instances, create a text file containing hostnames or IP addresses (one per line), as below:
-
-<pre>
-ec2-87-145-93-15.compute-1.amazonaws.com
-192.168.1.105
-fuzzinghost42.example.com
-</pre>
-
-On each of these machines, launch RemoteHarvester as below:
-
-<pre>RemoteHarvester -d c:\peachlogs\</pre>
-
-On the local machine, specify the list of hosts and the aggregate log folder in which to collect log files:
-
-<pre>PeachFarmerClient -i hosts.txt -d c:\aggregatedlogs\</pre>
-
-### PeachFarmer over SSL
-
-PeachFarmer supports connections over SSL with mutual authentication (client and server authentication). To transfer files over SSL, launch the RemoteHarvester with the commands below, where server.pfx is the server's X509 certificate and client.pfx is the client's X509 certificate.
-
-<pre>RemoteHarvester -d c:\peachlogs\ --server-cert=server.pfx --client-cert=client.pfx</pre>
-
-On the local machine, use a command similar to the below to communicate with the server over SSL.
-
-<pre>PeachFarmerClient -t 192.168.1.101 -d c:\aggregatedlogs\ --server-cert=server.pfx --client-cert=client.pfx</pre>
 
 ## Build Instructions
 
