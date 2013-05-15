@@ -1,13 +1,33 @@
 PeachFarmer
 ===========
 
+## What is It?
+
 PeachFarmer is a utility to collect log files from remote machines performing fuzz testing with the [Peach Fuzzing Framework](http://www.peachfuzzer.com).
 
 This is useful if you're running Peach instances on several AWS instances and you don't want to have to keep logging into each one to collect the logs and aggregate them manually.
 
-PeachFarmerClient - Run on your local machine to collect results from Peach workers.
+PeachFarmerClient - Runs on the user’s local machine and connects to each of the RemoteHarvester servers to retrieve the fuzzing output. The client then aggregates all of the files into a single location on the local machine.
 
-RemoteHarvester - Run this on each of your remote worker machines to act as a server to send back log files to the PeachFarmerClient.
+RemoteHarvester - A minimal server that runs on each of the remote fuzzing instances. It listens for connections and provides the client with any new log files the client does not already have.
+
+CertPairGenerator (Windows only) - Simple tool to create self-signed X509 certificates for PeachFarmer to use to communicate over SSL.
+
+## Binaries
+
+### Windows
+
+[PeachFarmer v1.0](https://s3.amazonaws.com/PeachFarmer/v1.0/PeachFarmer.zip)
+(MD5: c6c43295568de92a2c0529810e8f7f77)
+(SHA-256: b5179103735e6a062fc1bbf2e4ab8f24fe0351e1e0338670a7a3b32faa2d0abe)
+
+### Linux / OS X
+
+Coming soon!
+
+## Requirements
+
+Requires the .NET Framework v. 4.5
 
 ## QuickStart
 
@@ -48,3 +68,11 @@ PeachFarmer supports connections over SSL with mutual authentication (client and
 On the local machine, use a command similar to the below to communicate with the server over SSL.
 
 <pre>PeachFarmerClient -t 192.168.1.101 -d c:\aggregatedlogs\ --server-cert=server.pfx --client-cert=client.pfx</pre>
+
+## Build Instructions
+
+Builds with Visual Studio 2012 / VS Express for Desktop 2012.
+
+## Disclaimer
+
+iSEC has written this tool and provides it to the community free of charge. While iSEC has designed the tool with security in mind and has performed internal security review of the tool, it has not gone through the same level of rigorous independent review like that of a commercial software product. The software is being provided "as is" without warranty or support. iSEC does not assume liability for any damage caused by use of this tool.
