@@ -35,4 +35,4 @@ Builds with Visual Studio 2012 / VS Express for Desktop 2012.
 
 ## Disclaimer
 
-iSEC has written this tool and provides it to the community free of charge. While iSEC has designed the tool with security in mind and has performed internal security review of the tool, it has not gone through the same level of rigorous independent review like that of a commercial software product. The software is being provided "as is" without warranty or support. iSEC does not assume liability for any damage caused by use of this tool.
+iSEC has written this tool and provides it to the community free of charge. While iSEC has designed the tool with security in mind and has performed internal security review of the tool, it has not gone through the same level of rigorous independent review as a commercial software product. The software is being provided "as is" without warranty or support. iSEC does not assume liability for any damage caused by use of this tool.
