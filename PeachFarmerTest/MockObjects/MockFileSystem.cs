@@ -35,7 +35,8 @@ namespace PeachFarmerTest.MockObjects
                 // Don't treat it as a file in this directory if it's within a subfolder.
                 //
 
-                if (filename.IndexOf("\\", rootFolderEnd) > 0)
+                if ((filename.Length < rootFolderEnd) ||
+                    (filename.IndexOf("\\", rootFolderEnd) > 0))
                 {
                     continue;
                 }

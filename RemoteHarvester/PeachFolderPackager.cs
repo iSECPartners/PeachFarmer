@@ -81,6 +81,16 @@ namespace RemoteHarvester
 
             foreach (string subdirectory in _fileSystem.GetDirectories(sourceFolder))
             {
+                //
+                // Do not package files in Reproducing subdirectories, as these are temporary files used to reproduce
+                // faults.
+                //
+
+                if (subdirectory.EndsWith("\\Reproducing", StringComparison.InvariantCulture))
+                {
+                    continue;
+                }
+
                 filesToPackage.AddRange(GetFilesToPackage(subdirectory, lastModifiedMinimumUtc, true));
             }
 

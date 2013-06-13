@@ -30,6 +30,7 @@ namespace RemoteHarvesterTest
             fileSystem.AddMockFile(@"c:\logs\abc\Faults\1\oatmeal.txt", _checkpoints[0], "this is the oatmeal file!");
             fileSystem.AddMockFile(@"c:\logs\abc\Faults\2\potatoes.txt", _checkpoints[0], "here, have some potatoes");
             fileSystem.AddMockFile(@"c:\logs\abc\Faults\3\carrots.txt", _checkpoints[1], "carrots are orange");
+            fileSystem.AddMockFile(@"c:\logs\abc\Reproducing\4\tomatoes.txt", _checkpoints[1], "tomatoes are nutritious");
 
             fileSystem.AddMockFile(@"c:\logs\def\status.txt", _checkpoints[3], "hamburgers without cheese are called hamburgers");
             fileSystem.AddMockFile(@"c:\logs\def\Faults\15\hamburgers.txt", _checkpoints[2], "hamburgers without cheese are called hamburgers");
