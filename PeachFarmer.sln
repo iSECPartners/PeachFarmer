@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteHarvester", "RemoteHarvester\RemoteHarvester.csproj", "{5FF4DC4A-C8C4-4754-B110-9142E66C70C7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeachFarmerTest", "PeachFarmerTest\PeachFarmerTest.csproj", "{CF969EBE-0390-418B-911C-4BEE1E14DD40}"
@@ -10,6 +10,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeachFarmerClient", "PeachFarmerClient\PeachFarmerClient.csproj", "{7B887577-3C88-40CD-9382-ACB4396F7B04}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CertPairGenerator", "CertPairGenerator\CertPairGenerator.csproj", "{6CB165A3-716F-4552-BD41-07C3ABE20FDF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5E5D30AA-67D9-4051-AE89-C069CCB46B16}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.txt = LICENSE.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
