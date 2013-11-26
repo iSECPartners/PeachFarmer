@@ -1,4 +1,5 @@
-﻿using PeachFarmerLib;
+﻿using PeachFarmerClient.Framework;
+using PeachFarmerLib;
 using PeachFarmerLib.Framework;
 using System;
 using System.Collections.Generic;
@@ -10,23 +11,19 @@ using System.Threading.Tasks;
 
 namespace PeachFarmerClient
 {
-    public class NetworkClientConnection : NetworkConnectionBase
+    public class NetworkClientConnection : NetworkConnectionBase, INetworkClientConnection
     {
-        private string _host;
-
-        private int _port;
-
         public NetworkClientConnection(string host, int port, int timeout)
             :base(timeout)
         {
-            _host = host;
+            RemoteAddress = host;
 
-            _port = port;
+            RemotePort = port;
         }
 
         private void EnsureConnected()
         {
-            if (_tcpClient == null)
+            if (_tcpClient == null || !_tcpClient.Connected)
             {
                 Connect();
             }
@@ -35,14 +32,14 @@ namespace PeachFarmerClient
         private void Connect()
         {
             _tcpClient = new TcpClient();
-            IAsyncResult asyncResult = _tcpClient.BeginConnect(_host, _port, null, null);
+            IAsyncResult asyncResult = _tcpClient.BeginConnect(RemoteAddress, RemotePort, null, null);
             System.Threading.WaitHandle waitHandle = asyncResult.AsyncWaitHandle;
             try
             {
                 if (!asyncResult.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(_timeout), false))
                 {
                     _tcpClient.Close();
-                    throw new TimeoutException(string.Format("Failed to connect to {0}:{1} within {2} seconds.", _host, _port, _timeout));
+                    throw new TimeoutException(string.Format("Failed to connect to {0}:{1} within {2} seconds.", RemoteAddress, RemotePort, _timeout));
                 }
 
                 _tcpClient.EndConnect(asyncResult);
@@ -59,5 +56,9 @@ namespace PeachFarmerClient
 
             return base.GetStream();
         }
+
+        public string RemoteAddress { get; private set; }
+
+        public int RemotePort {get; private set; }
     }
 }

@@ -26,7 +26,7 @@ namespace PeachFarmerClientTest
         }
 
         [TestMethod]
-        public void TestPull()
+        public void PullTest()
         {
             ReadResponseMessage readResponse = new ReadResponseMessage();
             readResponse.IsPasswordCorrect = true;
@@ -38,24 +38,20 @@ namespace PeachFarmerClientTest
 
             using (Stream responseStream = ServerResponseToStream(readResponse))
             {
-                FilePuller filePuller = new FilePuller(responseStream, folderUnpacker, pullHistory, "the_r1ght_passw0rd");
+                FilePuller filePuller = new FilePuller(folderUnpacker, "the_r1ght_passw0rd");
 
                 const string destinationFolderExpected = @"c:\pulledfiles\";
 
-                filePuller.Pull("dummyhost", destinationFolderExpected);
+                filePuller.Pull(responseStream, destinationFolderExpected);
 
                 Assert.AreEqual(destinationFolderExpected, folderUnpacker.LastDestinationFolder);
-
-                //
-                // The file puller should treat the first four bytes as the data length (2) and last two bytes as the data
-                //
 
                 Assert.IsTrue(Util.ArraysEqual<byte>(new byte[] { 0xaa, 0xbb }, folderUnpacker.LastPackedData));
             }
         }
 
         [TestMethod]
-        public void TestInvalidPasswordPull()
+        public void InvalidPasswordPullTest()
         {
             ReadResponseMessage serverResponseMessage = new ReadResponseMessage();
             serverResponseMessage.IsPasswordCorrect = false;
@@ -65,8 +61,9 @@ namespace PeachFarmerClientTest
                 MockFolderUnpacker folderUnpacker = new MockFolderUnpacker();
                 PullHistory pullHistory = new PullHistory(new MockFileSystem(), "c:\\pullhistory.dat");
 
-                FilePuller filePuller = new FilePuller(responseStream, folderUnpacker, pullHistory, "the_wr0ng_passw0rd");
-                filePuller.Pull("dummyhost", @"c:\fakedestination");
+                FilePuller filePuller = new FilePuller(folderUnpacker, "the_wr0ng_passw0rd");
+
+                filePuller.Pull(responseStream, @"c:\fakedestination");
 
                 //
                 // Verify that client gracefully handles rejected passwords and does not try to download more data

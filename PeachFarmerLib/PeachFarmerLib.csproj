@@ -44,7 +44,6 @@
     <Compile Include="Framework\IFarmerNetworkMessage.cs" />
     <Compile Include="Framework\IFileSystem.cs" />
     <Compile Include="Framework\IFolderPackager.cs" />
-    <Compile Include="Framework\IFolderUnpacker.cs" />
     <Compile Include="Framework\INetworkConnection.cs" />
     <Compile Include="Framework\IPullHistory.cs" />
     <Compile Include="Messages\ReadRequestMessage.cs" />

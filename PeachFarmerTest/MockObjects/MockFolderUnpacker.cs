@@ -1,6 +1,8 @@
-﻿using PeachFarmerLib.Framework;
+﻿using PeachFarmerClient.Framework;
+using PeachFarmerLib.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +20,11 @@ namespace PeachFarmerTest.MockObjects
             LastDestinationFolder = destinationFolder;
 
             LastPackedData = packedData;
+        }
+
+        public Stream GetStatusFileStream()
+        {
+            throw new NotImplementedException();
         }
     }
 }

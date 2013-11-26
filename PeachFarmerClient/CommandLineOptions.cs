@@ -2,6 +2,7 @@
 using CommandLine.Text;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,9 @@ namespace PeachFarmerClient
         [Option('i', "inputList", MutuallyExclusiveSet="targets", MetaValue = "FILE",
                 HelpText = "File containing hostnames of workers to query (one per line).")]
         public string WorkerHostFile { get; set; }
+
+        [Option("aws", Required = false, HelpText = "Query AWS for workers.", DefaultValue=false)]
+        public bool UseAws { get; set; }
 
         [Option('d', "destination", MetaValue="DIRPATH", Required = true,
                 HelpText = "Destination folder to store files.")]
@@ -62,14 +66,22 @@ namespace PeachFarmerClient
 
         public bool Validate(out string errorMessage)
         {
-            if ((WorkerHost == null) && (WorkerHostFile == null))
+            if ((WorkerHost == null) && (WorkerHostFile == null) && !UseAws)
             {
-                errorMessage = "Must enter a target host or file of target hosts.";
+                errorMessage = "Must enter a target host, file of target hosts, or use AWS.";
                 return false;
             }
             else if ((ClientCertFile != null) && (ServerCertFile == null))
             {
                 errorMessage = "Cannot specify a client certificate without a server certificate.";
+                return false;
+            }
+            else if (UseAws &&
+                        (string.IsNullOrEmpty(ConfigurationManager.AppSettings["AWSAccessKey"]) ||
+                         string.IsNullOrEmpty(ConfigurationManager.AppSettings["AWSSecretKey"]) ||
+                         string.IsNullOrEmpty(ConfigurationManager.AppSettings["AWSRegion"])))
+            {
+                errorMessage = "Must specify AWSAccessKey, AWSSecretKey, and AWSRegion fields in PeachFarmerClient.exe.config to query AWS.";
                 return false;
             }
 

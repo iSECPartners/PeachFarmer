@@ -5,6 +5,8 @@ using RemoteHarvester;
 using PeachFarmerLib;
 using PeachFarmerClient;
 using PeachFarmerTest.MockObjects;
+using System.IO.Compression;
+using System.IO;
 
 namespace RemoteHarvesterTest
 {
@@ -26,13 +28,14 @@ namespace RemoteHarvesterTest
         {
             MockFileSystem fileSystem = new MockFileSystem();
 
-            fileSystem.AddMockFile(@"c:\logs\abc\status.txt", _checkpoints[1], "this is the oatmeal file!");
+            fileSystem.AddMockFile(@"c:\logs\abc\status.txt", _checkpoints[1], "this is the status file!");
             fileSystem.AddMockFile(@"c:\logs\abc\Faults\1\oatmeal.txt", _checkpoints[0], "this is the oatmeal file!");
             fileSystem.AddMockFile(@"c:\logs\abc\Faults\2\potatoes.txt", _checkpoints[0], "here, have some potatoes");
             fileSystem.AddMockFile(@"c:\logs\abc\Faults\3\carrots.txt", _checkpoints[1], "carrots are orange");
             fileSystem.AddMockFile(@"c:\logs\abc\Reproducing\4\tomatoes.txt", _checkpoints[1], "tomatoes are nutritious");
 
             fileSystem.AddMockFile(@"c:\logs\def\status.txt", _checkpoints[3], "hamburgers without cheese are called hamburgers");
+            fileSystem.AddMockFile(@"c:\logs\def\Faults\1\oatmeal.txt", _checkpoints[3], "this is a duplicate oatmeal file");
             fileSystem.AddMockFile(@"c:\logs\def\Faults\15\hamburgers.txt", _checkpoints[2], "hamburgers without cheese are called hamburgers");
             fileSystem.AddMockFile(@"c:\logs\def\Faults\18\lettuce.txt", _checkpoints[3], "let us eat lettuce");
 
@@ -40,7 +43,31 @@ namespace RemoteHarvesterTest
         }
 
         [TestMethod]
-        public void TestSingleFolderNullModifiedDatePackUnpack()
+        public void DuplicateFileTest()
+        {
+            IFileSystem mockFileSystem = GenerateMockFileSystem();
+
+            PeachFolderPackager packager = new PeachFolderPackager(mockFileSystem);
+            byte[] packedBytes = packager.PackFolder(@"c:\logs", new DateTime(0));
+
+            ZipArchive packedArchive = new ZipArchive(new MemoryStream(packedBytes));
+            
+            int oatmealFiles = 0;
+
+            for (int i = 0; i < packedArchive.Entries.Count; i++)
+            {
+                ZipArchiveEntry entry = packedArchive.Entries[i];
+                if (entry.FullName.Equals(@"Faults\1\oatmeal.txt"))
+                {
+                    oatmealFiles++;
+                }
+            }
+
+            Assert.AreEqual(1, oatmealFiles);
+        }
+
+        [TestMethod]
+        public void SingleFolderNullModifiedDatePackUnpackTest()
         {
             IFileSystem mockFileSystem = GenerateMockFileSystem();
 
@@ -48,18 +75,20 @@ namespace RemoteHarvesterTest
             byte[] packedBytes = packager.PackFolder(@"c:\logs\abc", new DateTime(0));
 
             MockFileSystem destinationFileSystem = new MockFileSystem();
-            FolderUnpacker unpackager = new FolderUnpacker(destinationFileSystem);
+            FolderUnpacker unpackager = new FolderUnpacker(destinationFileSystem, "xyz");
             unpackager.UnpackFolder(@"c:\collectedlogs", packedBytes);
 
             Assert.AreEqual(4, destinationFileSystem.GetTotalFileCount());
-            Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\status.txt"));
+            Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\status-xyz.txt"));
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\1\oatmeal.txt"));
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\2\potatoes.txt"));
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\3\carrots.txt"));
+
+            //TODO: Make sure we got the status file stream
         }
 
         [TestMethod]
-        public void TestMultiFolderNullModifiedDatePackUnpack()
+        public void MultiFolderNullModifiedDatePackUnpackTest()
         {
             IFileSystem mockFileSystem = GenerateMockFileSystem();
 
@@ -67,11 +96,11 @@ namespace RemoteHarvesterTest
             byte[] packedBytes = packager.PackFolder(@"c:\logs", new DateTime(0));
 
             MockFileSystem destinationFileSystem = new MockFileSystem();
-            FolderUnpacker unpackager = new FolderUnpacker(destinationFileSystem);
+            FolderUnpacker unpackager = new FolderUnpacker(destinationFileSystem, "xyz");
             unpackager.UnpackFolder(@"c:\collectedlogs", packedBytes);
 
             Assert.AreEqual(6, destinationFileSystem.GetTotalFileCount());
-            Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\status.txt"));
+            Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\status-xyz.txt"));
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\1\oatmeal.txt"));
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\2\potatoes.txt"));
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\3\carrots.txt"));
@@ -80,7 +109,7 @@ namespace RemoteHarvesterTest
         }
 
         [TestMethod]
-        public void TestDateSeparatedPackUnpack()
+        public void DateSeparatedPackUnpackTest()
         {
             IFileSystem mockFileSystem = GenerateMockFileSystem();
 
@@ -88,7 +117,7 @@ namespace RemoteHarvesterTest
             byte[] packedBytes = packager.PackFolder(@"c:\logs\abc\", _checkpoints[0].ToUniversalTime());
 
             MockFileSystem destinationFileSystem = new MockFileSystem();
-            FolderUnpacker unpackager = new FolderUnpacker(destinationFileSystem);
+            FolderUnpacker unpackager = new FolderUnpacker(destinationFileSystem, "xyz");
             unpackager.UnpackFolder(@"c:\collectedlogs\", packedBytes);
 
             //
@@ -97,12 +126,12 @@ namespace RemoteHarvesterTest
             //
 
             Assert.AreEqual(2, destinationFileSystem.GetTotalFileCount());
-            Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\status.txt"));
+            Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\status-xyz.txt"));
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\3\carrots.txt"));
         }
 
         [TestMethod]
-        public void TestDateAllExcludedPackUnpack()
+        public void DateAllExcludedPackUnpackTest()
         {
             IFileSystem mockFileSystem = GenerateMockFileSystem();
 
@@ -110,7 +139,7 @@ namespace RemoteHarvesterTest
             byte[] packedBytes = packager.PackFolder(@"c:\logs\", _checkpoints[3].ToUniversalTime());
 
             MockFileSystem destinationFileSystem = new MockFileSystem();
-            FolderUnpacker unpackager = new FolderUnpacker(destinationFileSystem);
+            FolderUnpacker unpackager = new FolderUnpacker(destinationFileSystem, "xyz");
             unpackager.UnpackFolder(@"c:\collectedlogs\", packedBytes);
 
             //
@@ -122,7 +151,7 @@ namespace RemoteHarvesterTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
-        public void TestDirectoryTraversal()
+        public void DirectoryTraversalTest()
         {
             //
             // This test should throw an exception because the package is attempting to cause FolderUnpacker to unpack outside of
@@ -137,7 +166,7 @@ namespace RemoteHarvesterTest
             byte[] packedBytes = packager.PackFolder(@"c:\root", new DateTime(0));
 
             MockFileSystem destinationFileSystem = new MockFileSystem();
-            FolderUnpacker unpackager = new FolderUnpacker(destinationFileSystem);
+            FolderUnpacker unpackager = new FolderUnpacker(destinationFileSystem, "xyz");
             unpackager.UnpackFolder(@"c:\collectedlogs", packedBytes);
         }
     }

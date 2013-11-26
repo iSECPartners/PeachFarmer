@@ -32,10 +32,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AWSSDK">
+      <HintPath>C:\Program Files (x86)\AWS SDK for .NET\bin\Net45\AWSSDK.dll</HintPath>
+    </Reference>
     <Reference Include="CommandLine">
       <HintPath>..\ExternalLibs\CommandLine.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Xml.Linq" />
@@ -45,17 +49,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AwsWorkerController.cs" />
+    <Compile Include="AwsWorkerInfo.cs" />
+    <Compile Include="Framework\IFilePuller.cs" />
+    <Compile Include="Framework\INetworkClientConnection.cs" />
+    <Compile Include="Framework\INetworkStreamCreator.cs" />
+    <Compile Include="Framework\IWorkerInfo.cs" />
+    <Compile Include="Framework\ICloudWorkerController.cs" />
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="CommandProcessor.cs" />
     <Compile Include="FilePuller.cs" />
     <Compile Include="FolderUnpacker.cs" />
+    <Compile Include="Framework\IFolderUnpacker.cs" />
+    <Compile Include="Framework\IStatusFileParser.cs" />
+    <Compile Include="Framework\IWorkerPullHistory.cs" />
     <Compile Include="NetworkClientConnection.cs" />
     <Compile Include="NetworkSslClientConnection.cs" />
-    <Compile Include="PeachFolderUnpacker.cs" />
+    <Compile Include="PeachStatus.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PullHistory.cs" />
+    <Compile Include="RemoteWorker.cs" />
+    <Compile Include="StatusFileParser.cs" />
     <Compile Include="TargetFileParser.cs" />
+    <Compile Include="WorkerInfo.cs" />
+    <Compile Include="WorkerManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -66,6 +84,7 @@
       <Name>PeachFarmerLib</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

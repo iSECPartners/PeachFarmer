@@ -13,9 +13,12 @@ namespace RemoteHarvester
     {
         private IFileSystem _fileSystem;
 
+        private HashSet<string> _alreadyPacked;
+
         public PeachFolderPackager(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
+            _alreadyPacked = new HashSet<string>();
         }
 
         public byte[] PackFolder(string sourceFolder, DateTime lastModifiedMinimumUtc)
@@ -99,14 +102,18 @@ namespace RemoteHarvester
 
         private void PackFile(string folderRoot, string filename, ZipArchive zipArchive)
         {
-            string zipEntryName = filename.Substring(folderRoot.Length);
-            if (zipEntryName.StartsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.InvariantCulture))
+            string zipEntryName = ZipEntryNameFromFilename(folderRoot, filename);
+
+            //
+            // Don't pack duplicate files.
+            //
+
+            if (_alreadyPacked.Contains(zipEntryName))
             {
-                zipEntryName = zipEntryName.Substring(1);
+                return;
             }
 
             ZipArchiveEntry entry = zipArchive.CreateEntry(zipEntryName);
-
             using (Stream fileStream = _fileSystem.GetReadStream(filename))
             {
                 using (Stream archiveStream = entry.Open())
@@ -114,6 +121,19 @@ namespace RemoteHarvester
                     fileStream.CopyTo(archiveStream);
                 }
             }
+
+            _alreadyPacked.Add(zipEntryName);
+        }
+
+        private string ZipEntryNameFromFilename(string folderRoot, string filename)
+        {
+            string zipEntryName = filename.Substring(folderRoot.Length);
+            if (zipEntryName.StartsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.InvariantCulture))
+            {
+                zipEntryName = zipEntryName.Substring(1);
+            }
+
+            return zipEntryName;
         }
 
         private List<string> FindPeachRunLogDirectories(string folderRoot)

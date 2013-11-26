@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
+using PeachFarmerClient.Framework;
 using PeachFarmerLib.Framework;
 
 namespace PeachFarmerClient
@@ -12,10 +13,13 @@ namespace PeachFarmerClient
     public class FolderUnpacker : IFolderUnpacker
     {
         private IFileSystem _fileSystem;
+        private string _disambiguatorName;
+        private string _statusFilePath;
 
-        public FolderUnpacker(IFileSystem fileSystem)
+        public FolderUnpacker(IFileSystem fileSystem, string disambiguatorName)
         {
             _fileSystem = fileSystem;
+            _disambiguatorName = disambiguatorName;
         }
 
         public void UnpackFolder(string destinationFolder, byte[] packedData)
@@ -31,30 +35,41 @@ namespace PeachFarmerClient
 
         private void ExtractPackEntry(ZipArchiveEntry archiveEntry, string destinationFolder)
         {
-            string outputFileName = GenerateExtractedFilename(destinationFolder, archiveEntry.FullName);
-            Stream outputStream = _fileSystem.GetOutputStream(outputFileName);
-            using (BinaryWriter streamWriter = new BinaryWriter(outputStream))
+            string outputFilename;
+            bool isStatusFile;
+
+            GenerateExtractedFilename(destinationFolder, archiveEntry.FullName, out outputFilename, out isStatusFile);
+            using (Stream sourceStream = archiveEntry.Open())
             {
-                using (BinaryReader streamReader = new BinaryReader(archiveEntry.Open()))
+                using (Stream destinationStream = _fileSystem.GetOutputStream(outputFilename))
                 {
-                    try
-                    {
-                        while (true)
-                        {
-                            streamWriter.Write(streamReader.ReadByte());
-                        }
-                    }
-                    catch (EndOfStreamException)
-                    {
-                        ;
-                    }
+                    sourceStream.CopyTo(destinationStream);
                 }
+            }
+
+            if (isStatusFile)
+            {
+                _statusFilePath = outputFilename;
             }
         }
 
-        protected virtual string GenerateExtractedFilename(string destinationFolder, string packagePath)
+        protected void GenerateExtractedFilename(string destinationFolder, string packagePath, out string outputFilename, out bool isStatusFile)
         {
-            string combinedPath = Path.Combine(destinationFolder, packagePath);
+            string fixedPackagePath;
+
+            if ((string.CompareOrdinal(packagePath, "status.txt") == 0) ||
+                packagePath.EndsWith(Path.DirectorySeparatorChar + "status.txt", StringComparison.InvariantCulture))
+            {
+                fixedPackagePath = string.Format("status-{0}.txt", _disambiguatorName);
+                isStatusFile = true;
+            }
+            else
+            {
+                fixedPackagePath = packagePath;
+                isStatusFile = false;
+            }
+
+            string combinedPath = Path.Combine(destinationFolder, fixedPackagePath);
 
             //
             // Convert the path to canonicalized form.
@@ -67,7 +82,12 @@ namespace PeachFarmerClient
                 throw new ArgumentException("Invalid package path. Package files must not be located outside of root directory.");
             }
 
-            return fullPath;
+            outputFilename = fullPath;
+        }
+
+        public Stream GetStatusFileStream()
+        {
+            return _fileSystem.GetReadStream(_statusFilePath);
         }
     }
 }

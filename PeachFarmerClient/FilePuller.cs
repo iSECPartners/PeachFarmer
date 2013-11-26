@@ -1,4 +1,5 @@
-﻿using PeachFarmerLib;
+﻿using PeachFarmerClient.Framework;
+using PeachFarmerLib;
 using PeachFarmerLib.Framework;
 using PeachFarmerLib.Messages;
 using System;
@@ -10,37 +11,38 @@ using System.Threading.Tasks;
 
 namespace PeachFarmerClient
 {
-    public class FilePuller
+    public class FilePuller : IFilePuller
     {
-        private Stream _serverStream;
-
         private IFolderUnpacker _folderUnpacker;
 
-        private IPullHistory _pullHistory;
+        private DateTime _lastPullTime;
 
         private string _serverPassword;
 
-        public FilePuller(Stream serverStream, IFolderUnpacker folderUnpacker, IPullHistory pullHistory, string serverPassword)
+        public FilePuller(IFolderUnpacker folderUnpacker, string serverPassword)
+            :this(folderUnpacker, DateTime.MinValue, serverPassword)
         {
-            _serverStream = serverStream;
+        }
 
+        public FilePuller(IFolderUnpacker folderUnpacker, DateTime lastPullTime, string serverPassword)
+        {
             _folderUnpacker = folderUnpacker;
 
-            _pullHistory = pullHistory;
+            _lastPullTime = lastPullTime;
 
             _serverPassword = serverPassword;
         }
 
-        public void Pull(string workerName, string destinationFolder)
+        public void Pull(Stream serverStream, string destinationFolder)
         {
             ReadRequestMessage readRequest = new ReadRequestMessage();
-            readRequest.LastCheckTimeUtc = _pullHistory.GetLastPullTime(workerName);
+            readRequest.LastCheckTimeUtc = _lastPullTime;
             readRequest.ServerPassword = _serverPassword;
 
             FarmerMessageSerializer messageSerializer = new FarmerMessageSerializer();
-            messageSerializer.Serialize(_serverStream, readRequest);
+            messageSerializer.Serialize(serverStream, readRequest);
 
-            ReadResponseMessage readResponse = (ReadResponseMessage)messageSerializer.Deserialize(_serverStream);
+            ReadResponseMessage readResponse = (ReadResponseMessage)messageSerializer.Deserialize(serverStream);
             if (!readResponse.IsPasswordCorrect)
             {
                 Console.WriteLine("Error: Incorrect password.");
@@ -48,10 +50,35 @@ namespace PeachFarmerClient
             }
 
             Console.WriteLine("Server check time was {0}", readResponse.CurrentServerTimeUtc.ToLocalTime());
-            Console.WriteLine("Read {0} bytes", readResponse.Data.Length);
+            Console.WriteLine("Read {0}", FormatByteCount(readResponse.Data.Length));
 
             _folderUnpacker.UnpackFolder(destinationFolder, readResponse.Data);
-            _pullHistory.SetLastPullTime(workerName, readResponse.CurrentServerTimeUtc);
+
+            _lastPullTime = readResponse.CurrentServerTimeUtc;
+        }
+
+        private string FormatByteCount(int byteCount)
+        {
+            const int BytesPerMegabyte = 1024 * 1024;
+            const int BytesPerKilobyte = 1024;
+
+            if (byteCount > BytesPerMegabyte)
+            {
+                return (string.Format("{0:0.00} MB", ((float)byteCount / BytesPerMegabyte)));
+            }
+            else if (byteCount > BytesPerKilobyte)
+            {
+                return (string.Format("{0:0.00} KB", ((float)byteCount / BytesPerKilobyte)));
+            }
+            else
+            {
+                return string.Format("{0} bytes", byteCount);
+            }
+        }
+
+        public Stream GetStatusFileStream()
+        {
+            return _folderUnpacker.GetStatusFileStream();
         }
     }
 }
