@@ -13,30 +13,30 @@ namespace PeachFarmerClient
 {
     public class FilePuller : IFilePuller
     {
-        private IFolderUnpacker _folderUnpacker;
+        public DateTime LastPullTime { get; private set; }
 
-        private DateTime _lastPullTime;
+        private IFolderUnpacker _folderUnpacker;
 
         private string _serverPassword;
 
         public FilePuller(IFolderUnpacker folderUnpacker, string serverPassword)
-            :this(folderUnpacker, DateTime.MinValue, serverPassword)
+            : this(folderUnpacker, serverPassword, DateTime.MinValue)
         {
         }
 
-        public FilePuller(IFolderUnpacker folderUnpacker, DateTime lastPullTime, string serverPassword)
+        public FilePuller(IFolderUnpacker folderUnpacker, string serverPassword, DateTime lastPullTime)
         {
             _folderUnpacker = folderUnpacker;
 
-            _lastPullTime = lastPullTime;
-
             _serverPassword = serverPassword;
+
+            LastPullTime = lastPullTime;
         }
 
         public void Pull(Stream serverStream, string destinationFolder)
         {
             ReadRequestMessage readRequest = new ReadRequestMessage();
-            readRequest.LastCheckTimeUtc = _lastPullTime;
+            readRequest.LastCheckTimeUtc = LastPullTime;
             readRequest.ServerPassword = _serverPassword;
 
             FarmerMessageSerializer messageSerializer = new FarmerMessageSerializer();
@@ -54,7 +54,7 @@ namespace PeachFarmerClient
 
             _folderUnpacker.UnpackFolder(destinationFolder, readResponse.Data);
 
-            _lastPullTime = readResponse.CurrentServerTimeUtc;
+            LastPullTime = readResponse.CurrentServerTimeUtc;
         }
 
         private string FormatByteCount(int byteCount)

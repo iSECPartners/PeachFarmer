@@ -45,7 +45,6 @@
     <Compile Include="Framework\IFileSystem.cs" />
     <Compile Include="Framework\IFolderPackager.cs" />
     <Compile Include="Framework\INetworkConnection.cs" />
-    <Compile Include="Framework\IPullHistory.cs" />
     <Compile Include="Messages\ReadRequestMessage.cs" />
     <Compile Include="Messages\ReadResponseMessage.cs" />
     <Compile Include="NetworkConnectionBase.cs" />
