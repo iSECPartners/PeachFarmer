@@ -30,7 +30,7 @@ namespace PeachFarmerClientTest
         {
             ReadResponseMessage readResponse = new ReadResponseMessage();
             readResponse.IsPasswordCorrect = true;
-            readResponse.CurrentServerTimeUtc = new DateTime(0);
+            readResponse.CurrentServerTimeUtc = new DateTime(2012, 1, 23);
             readResponse.Data = new byte[] { 0xaa, 0xbb };
 
             MockFolderUnpacker folderUnpacker = new MockFolderUnpacker();
@@ -44,6 +44,8 @@ namespace PeachFarmerClientTest
                 filePuller.Pull(responseStream, destinationFolderExpected);
 
                 Assert.AreEqual(destinationFolderExpected, folderUnpacker.LastDestinationFolder);
+
+                Assert.AreEqual(readResponse.CurrentServerTimeUtc, filePuller.LastPullTime);
 
                 Assert.IsTrue(Util.ArraysEqual<byte>(new byte[] { 0xaa, 0xbb }, folderUnpacker.LastPackedData));
             }
