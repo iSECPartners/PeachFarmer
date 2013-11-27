@@ -84,7 +84,7 @@ namespace RemoteHarvesterTest
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\2\potatoes.txt"));
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\3\carrots.txt"));
 
-            //TODO: Make sure we got the status file stream
+            Assert.IsNotNull(unpackager.GetStatusFileStream());
         }
 
         [TestMethod]
@@ -106,6 +106,8 @@ namespace RemoteHarvesterTest
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\3\carrots.txt"));
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\15\hamburgers.txt"));
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\18\lettuce.txt"));
+
+            Assert.IsNotNull(unpackager.GetStatusFileStream());
         }
 
         [TestMethod]
@@ -128,6 +130,8 @@ namespace RemoteHarvesterTest
             Assert.AreEqual(2, destinationFileSystem.GetTotalFileCount());
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\status-xyz.txt"));
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\3\carrots.txt"));
+
+            Assert.IsNotNull(unpackager.GetStatusFileStream());
         }
 
         [TestMethod]
