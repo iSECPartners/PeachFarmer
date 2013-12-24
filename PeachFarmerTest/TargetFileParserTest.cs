@@ -32,6 +32,9 @@ namespace PeachFarmerClientTest
             VerifyParseEquals("domain1.com\ndomain2.com", new string[] { "domain1.com", "domain2.com" }); // handle Unix-style newlines
             VerifyParseEquals("domain1.com\r\n\r\ndomain2.com", new string[] { "domain1.com", "domain2.com" }); // ignore empty lines
             VerifyParseEquals("\r\ndomain1.com\r\ndomain2.com", new string[] { "domain1.com", "domain2.com" }); // ignore empty lines
+
+            // ignore comments after the hostname
+            VerifyParseEquals("domain1.com # this is the best domain\r\ndomain2.com # this domain isn't so good", new string[] { "domain1.com", "domain2.com" });
         }
     }
 }

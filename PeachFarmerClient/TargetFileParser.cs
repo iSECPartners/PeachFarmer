@@ -16,7 +16,7 @@ namespace PeachFarmerClient
             using (StreamReader reader = new StreamReader(targetFileStream))
             {
                 targets = (from line in reader.ReadToEnd().Split(new char[] { '\r', '\n' } )
-                               let trimmed = line.Trim()
+                               let trimmed = line.Split(new char[] { ' ', '\t'})[0]
                                where !string.IsNullOrWhiteSpace(trimmed)
                                select trimmed).ToList();
             }
