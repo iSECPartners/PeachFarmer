@@ -17,11 +17,12 @@ namespace RemoteHarvesterTest
 
         public FolderPackagerTest()
         {
-            _checkpoints = new DateTime[4];
+            _checkpoints = new DateTime[5];
             _checkpoints[0] = new DateTime(2012, 6, 12, 10, 09, 23);
             _checkpoints[1] = new DateTime(2012, 6, 12, 10, 12, 45);
             _checkpoints[2] = new DateTime(2012, 6, 12, 10, 15, 08);
             _checkpoints[3] = new DateTime(2012, 6, 12, 10, 15, 29);
+            _checkpoints[4] = new DateTime(2012, 6, 12, 10, 15, 30);
         }
 
         private IFileSystem GenerateMockFileSystem()
@@ -108,6 +109,22 @@ namespace RemoteHarvesterTest
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\18\lettuce.txt"));
 
             Assert.IsNotNull(unpackager.GetStatusFileStream());
+        }
+
+        [TestMethod]
+        public void MultiFolderNothingModifiedTest()
+        {
+            IFileSystem mockFileSystem = GenerateMockFileSystem();
+
+            PeachFolderPackager packager = new PeachFolderPackager(mockFileSystem);
+            byte[] packedBytes = packager.PackFolder(@"c:\logs", _checkpoints[4].ToUniversalTime());
+
+            MockFileSystem destinationFileSystem = new MockFileSystem();
+            FolderUnpacker unpackager = new FolderUnpacker(destinationFileSystem, "xyz");
+            unpackager.UnpackFolder(@"c:\collectedlogs", packedBytes);
+
+            Assert.AreEqual(0, destinationFileSystem.GetTotalFileCount());
+            Assert.IsNull(unpackager.GetStatusFileStream());
         }
 
         [TestMethod]

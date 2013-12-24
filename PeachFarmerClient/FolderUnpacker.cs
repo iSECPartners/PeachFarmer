@@ -87,6 +87,11 @@ namespace PeachFarmerClient
 
         public Stream GetStatusFileStream()
         {
+            if (_statusFilePath == null)
+            {
+                return null;
+            }
+
             return _fileSystem.GetReadStream(_statusFilePath);
         }
     }
