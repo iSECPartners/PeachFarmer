@@ -7,6 +7,7 @@ using PeachFarmerClient;
 using PeachFarmerTest.MockObjects;
 using System.IO.Compression;
 using System.IO;
+using System.Linq;
 
 namespace RemoteHarvesterTest
 {
@@ -86,6 +87,18 @@ namespace RemoteHarvesterTest
             Assert.IsTrue(destinationFileSystem.FileExists(@"c:\collectedlogs\Faults\3\carrots.txt"));
 
             Assert.IsNotNull(unpackager.GetStatusFileStream());
+        }
+
+        [TestMethod]
+        public void DoublePackTest()
+        {
+            IFileSystem mockFileSystem = GenerateMockFileSystem();
+
+            PeachFolderPackager packager = new PeachFolderPackager(mockFileSystem);
+            byte[] packedBytes1 = packager.PackFolder(@"c:\logs\abc", new DateTime(0));
+            byte[] packedBytes2 = packager.PackFolder(@"c:\logs\abc", new DateTime(0));
+            
+            Assert.IsTrue(packedBytes1.SequenceEqual(packedBytes2));
         }
 
         [TestMethod]

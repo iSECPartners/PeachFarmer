@@ -18,11 +18,12 @@ namespace RemoteHarvester
         public PeachFolderPackager(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
-            _alreadyPacked = new HashSet<string>();
         }
 
         public byte[] PackFolder(string sourceFolder, DateTime lastModifiedMinimumUtc)
         {
+            _alreadyPacked = new HashSet<string>();
+
             List<string> logDirectories = FindPeachRunLogDirectories(sourceFolder);
 
             string latestLogDirectory = GetLatestLogDirectory(logDirectories);
