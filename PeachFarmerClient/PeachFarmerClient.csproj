@@ -71,6 +71,7 @@
     <Compile Include="StatusFileParser.cs" />
     <Compile Include="TargetFileParser.cs" />
     <Compile Include="WorkerInfo.cs" />
+    <Compile Include="WorkerInfoSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
