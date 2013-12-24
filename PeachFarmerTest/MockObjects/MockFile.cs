@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RemoteHarvesterTest.MockObjects;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,7 +26,7 @@ namespace PeachFarmerTest.MockObjects
         {
             Filename = filename;
             LastModifiedTime = lastModifiedTime;
-            DataStream = new MemoryStream();
+            DataStream = new MockMemoryStream();
         }
 
         public override bool Equals(object obj)
