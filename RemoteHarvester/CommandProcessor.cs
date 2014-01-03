@@ -40,7 +40,7 @@ namespace RemoteHarvester
 
             using (NetworkServerConnection tcpServer = CreateNetworkConnection(listenPort, _serverCertFile, _clientCertFile))
             {
-                FolderMonitor folderMontior = new FolderMonitor(tcpServer, packager, new Clock(), _folderPath, _connectionPassword);
+                RequestListener folderMontior = new RequestListener(tcpServer, packager, new Clock(), _folderPath, _connectionPassword);
 
                 folderMontior.Monitor();
             }

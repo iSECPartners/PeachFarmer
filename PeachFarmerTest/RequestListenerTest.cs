@@ -13,7 +13,7 @@ using RemoteHarvesterTest.TestStreams;
 namespace RemoteHarvesterTest
 {
     [TestClass]
-    public class FolderMonitorTest
+    public class RequestListenerTest
     {
         const string CorrectPassword = "the_r1ght_passw0rd";
 
@@ -39,7 +39,7 @@ namespace RemoteHarvesterTest
             using (BookmarkableStream clientStream = ClientRequestToStream(readRequest))
             {
                 MockNetworkConnection networkConnection = new MockNetworkConnection(clientStream);
-                FolderMonitor folderMonitor = new FolderMonitor(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", CorrectPassword);
+                RequestListener folderMonitor = new RequestListener(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", CorrectPassword);
                 folderMonitor.ProcessNextRequest();
                 Assert.AreEqual(@"c:\fakepath\fakedir", mockFolderPackager.LastFolderPacked);
                 Assert.AreEqual(startTimestampExpected, mockFolderPackager.LastModifiedMinimumRequested);
@@ -70,7 +70,7 @@ namespace RemoteHarvesterTest
                 MockFolderPackager mockFolderPackager = new MockFolderPackager();
                 MockClock serverClock = new MockClock(new DateTime(2007, 5, 25, 15, 27, 03));
 
-                FolderMonitor folderMonitor = new FolderMonitor(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", correctPassword);
+                RequestListener folderMonitor = new RequestListener(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", correctPassword);
                 folderMonitor.ProcessNextRequest();
 
                 clientStream.ResetToBookmark();

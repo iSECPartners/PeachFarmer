@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace RemoteHarvester
 {
-    public class FolderMonitor
+    public class RequestListener
     {
         private INetworkConnection _serverConnection;
 
@@ -21,7 +21,7 @@ namespace RemoteHarvester
 
         private Stream _clientStream;
 
-        public FolderMonitor(INetworkConnection serverConnection, IFolderPacker folderPackager, IClock clock, string folderPath, string password)
+        public RequestListener(INetworkConnection serverConnection, IFolderPacker folderPackager, IClock clock, string folderPath, string password)
         {
             _serverConnection = serverConnection;
 

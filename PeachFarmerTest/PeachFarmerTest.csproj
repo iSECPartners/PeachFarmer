@@ -58,7 +58,7 @@
     <Compile Include="TestStreams\BookmarkableStream.cs" />
     <Compile Include="TestStreams\ReadingStream.cs" />
     <Compile Include="TargetFileParserTest.cs" />
-    <Compile Include="FolderMonitorTest.cs" />
+    <Compile Include="RequestListenerTest.cs" />
     <Compile Include="MockObjects\MockClock.cs" />
     <Compile Include="MockObjects\MockFile.cs" />
     <Compile Include="MockObjects\MockFileSystem.cs" />

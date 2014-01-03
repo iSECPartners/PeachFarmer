@@ -49,7 +49,7 @@
     <Compile Include="Clock.cs" />
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="CommandProcessor.cs" />
-    <Compile Include="FolderMonitor.cs" />
+    <Compile Include="RequestListener.cs" />
     <Compile Include="IClock.cs" />
     <Compile Include="NetworkSslServerConnection.cs" />
     <Compile Include="PasswordHasher.cs" />
