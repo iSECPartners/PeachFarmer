@@ -14,6 +14,8 @@ namespace PeachFarmerClient
     {
         private List<RemoteWorker> _workers;
 
+        private WorkerInfoSerializer _workerInfoSerializer;
+
         private string _destinationFolder;
 
         private string _serverPassword;
@@ -24,6 +26,8 @@ namespace PeachFarmerClient
 
         public CommandProcessor(CommandLineOptions options)
         {
+            _workerInfoSerializer = new WorkerInfoSerializer();
+
             _destinationFolder = options.DestinationFolder;
 
             _serverPassword = options.Password;
@@ -97,7 +101,8 @@ namespace PeachFarmerClient
         {
             foreach (IWorkerInfo workerInfo in workersInfo)
             {
-                if ((workerInfo.Id == toMatch.Id) || (workerInfo.RemoteAddress == toMatch.RemoteAddress))
+                if ((!string.IsNullOrEmpty(workerInfo.Id) && (workerInfo.Id == toMatch.Id)) || 
+                    (workerInfo.RemoteAddress == toMatch.RemoteAddress))
                 {
                     return workerInfo;
                 }
@@ -120,10 +125,7 @@ namespace PeachFarmerClient
             {
                 using (Stream savedInfoStream = File.OpenRead(savedFilePath))
                 {
-                    while (savedInfoStream.Position < savedInfoStream.Length)
-                    {
-                        savedWorkersInfo.Add(WorkerInfoFromStream(savedInfoStream));
-                    }
+                    savedWorkersInfo.AddRange(_workerInfoSerializer.DeserializeWorkerInfoList(savedInfoStream));
                 }
             }
             catch (IOException)
@@ -139,27 +141,15 @@ namespace PeachFarmerClient
             List<IWorkerInfo> savedWorkersInfo = new List<IWorkerInfo>();
             string savedFilePath = GetWorkerInfoPath(_destinationFolder);
 
+            foreach (RemoteWorker worker in _workers)
+            {
+                savedWorkersInfo.Add(worker.GetInfo());
+            }
+
             using (Stream savedInfoStream = File.OpenWrite(savedFilePath))
             {
-                foreach (RemoteWorker worker in _workers)
-                {
-                    WorkerInfoToStream(savedInfoStream, worker.GetInfo());
-                }
+                _workerInfoSerializer.SerializeWorkerInfoList(savedInfoStream, savedWorkersInfo);
             }
-        }
-
-        private IWorkerInfo WorkerInfoFromStream(Stream serializationStream)
-        {
-            BinaryFormatter formatter = new BinaryFormatter();
-
-            return ((IWorkerInfo) formatter.Deserialize(serializationStream));
-        }
-
-        private void WorkerInfoToStream(Stream serializationStream, IWorkerInfo workerInfo)
-        {
-            BinaryFormatter formatter = new BinaryFormatter();
-
-            formatter.Serialize(serializationStream, workerInfo);
         }
 
         private List<IWorkerInfo> WorkerInfoFromCommandLineOptions(CommandLineOptions options)

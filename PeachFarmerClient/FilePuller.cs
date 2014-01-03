@@ -35,9 +35,7 @@ namespace PeachFarmerClient
 
         public void Pull(Stream serverStream, string destinationFolder)
         {
-            ReadRequestMessage readRequest = new ReadRequestMessage();
-            readRequest.LastCheckTimeUtc = LastPullTime;
-            readRequest.ServerPassword = _serverPassword;
+            ReadRequestMessage readRequest = new ReadRequestMessage(LastPullTime, _serverPassword);
 
             FarmerMessageSerializer messageSerializer = new FarmerMessageSerializer();
             messageSerializer.Serialize(serverStream, readRequest);

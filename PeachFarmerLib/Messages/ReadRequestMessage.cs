@@ -9,19 +9,17 @@ using System.Threading.Tasks;
 namespace PeachFarmerLib.Messages
 {
     [Serializable()]
-    public class ReadRequestMessage : IFarmerNetworkMessage
+    public class ReadRequestMessage : RequestMessageBase
     {
         public DateTime LastCheckTimeUtc { get; set; }
 
-        public string ServerPassword { get; set; }
-
-        public ReadRequestMessage()
+        public ReadRequestMessage(DateTime lastCheckTimeUtc, string password)
+            :base(password)
         {
-            LastCheckTimeUtc = new DateTime(0);
-            ServerPassword = null;
+            LastCheckTimeUtc = lastCheckTimeUtc;
         }
 
-        public byte MessageType
+        public override byte MessageType
         {
             get { return PeachFarmerProtocol.ReadRequest; }
         }
@@ -38,17 +36,7 @@ namespace PeachFarmerLib.Messages
                 return false;
             }
 
-            if (this.ServerPassword != other.ServerPassword)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
+            return base.Equals(other);
         }
     }
 }

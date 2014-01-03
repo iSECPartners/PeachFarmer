@@ -8,22 +8,19 @@ using System.Threading.Tasks;
 namespace PeachFarmerLib.Messages
 {
     [Serializable()]
-    public class ReadResponseMessage : IFarmerNetworkMessage
+    public class ReadResponseMessage : ResponseMessageBase
     {
         public DateTime CurrentServerTimeUtc { get; set; }
-
-        public bool IsPasswordCorrect { get; set; }
 
         public byte[] Data { get; set; }
 
         public ReadResponseMessage()
         {
             CurrentServerTimeUtc = new DateTime();
-            IsPasswordCorrect = false;
             Data = null;
         }
 
-        public byte MessageType
+        public override byte MessageType
         {
             get { return PeachFarmerProtocol.ReadResponse; }
         }

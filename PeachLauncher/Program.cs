@@ -6,7 +6,7 @@ using System.ServiceModel.Description;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FuzzingWorker
+namespace PeachLauncher
 {
     class Program
     {

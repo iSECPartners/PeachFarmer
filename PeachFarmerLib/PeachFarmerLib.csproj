@@ -45,8 +45,12 @@
     <Compile Include="Framework\IFileSystem.cs" />
     <Compile Include="Framework\IFolderPackager.cs" />
     <Compile Include="Framework\INetworkConnection.cs" />
+    <Compile Include="Messages\AssignWorkResponseMessage.cs" />
     <Compile Include="Messages\ReadRequestMessage.cs" />
     <Compile Include="Messages\ReadResponseMessage.cs" />
+    <Compile Include="Messages\RequestMessageBase.cs" />
+    <Compile Include="Messages\AssignWorkRequestMessage.cs" />
+    <Compile Include="Messages\ResponseMessageBase.cs" />
     <Compile Include="NetworkConnectionBase.cs" />
     <Compile Include="PeachFarmerProtocol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

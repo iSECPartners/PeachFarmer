@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FuzzingWorker
+namespace PeachLauncher
 {
     public class Launcher : ILauncherService
     {

@@ -32,6 +32,8 @@ namespace PeachFarmerClient
                 CommandProcessor processor = new CommandProcessor(options);
                 processor.PullFilesFromWorkers();
             }
+            Console.WriteLine("Any key to exit.");
+            Console.ReadKey();
         }
     }
 }

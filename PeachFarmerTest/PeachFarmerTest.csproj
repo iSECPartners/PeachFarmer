@@ -51,7 +51,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AssignWorkRequestProcessorTest.cs" />
     <Compile Include="FarmerMessageSerializerTest.cs" />
+    <Compile Include="MockObjects\MockLauncherService.cs" />
     <Compile Include="MockObjects\MockMemoryStream.cs" />
     <Compile Include="TestStreams\BookmarkableStream.cs" />
     <Compile Include="TestStreams\ReadingStream.cs" />
@@ -77,6 +79,10 @@
     <ProjectReference Include="..\PeachFarmerLib\PeachFarmerLib.csproj">
       <Project>{5da35c75-e83b-4a68-a461-424b5e84897e}</Project>
       <Name>PeachFarmerLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PeachLauncher\PeachLauncher.csproj">
+      <Project>{cb19fb4e-c3eb-4350-af66-b4a95185d33e}</Project>
+      <Name>PeachLauncher</Name>
     </ProjectReference>
     <ProjectReference Include="..\RemoteHarvester\RemoteHarvester.csproj">
       <Project>{5ff4dc4a-c8c4-4754-b110-9142e66c70c7}</Project>

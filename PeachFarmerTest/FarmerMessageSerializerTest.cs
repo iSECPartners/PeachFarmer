@@ -19,9 +19,7 @@ namespace PeachFarmerClientTest
         [TestMethod]
         public void SerializeDeserializeTest()
         {
-            ReadRequestMessage messageOriginal = new ReadRequestMessage();
-            messageOriginal.LastCheckTimeUtc = new DateTime(2012, 5, 27);
-            messageOriginal.ServerPassword = "";
+            ReadRequestMessage messageOriginal = new ReadRequestMessage(new DateTime(2012, 5, 27), "");
 
             FarmerMessageSerializer serializer = new FarmerMessageSerializer();
             MemoryStream stream = new MemoryStream();

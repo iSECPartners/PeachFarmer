@@ -34,9 +34,7 @@ namespace RemoteHarvesterTest
             MockFolderPackager mockFolderPackager = new MockFolderPackager();
             MockClock serverClock = new MockClock(new DateTime(2007, 5, 25, 15, 27, 03));
 
-            ReadRequestMessage readRequest = new ReadRequestMessage();
-            readRequest.LastCheckTimeUtc = startTimestampExpected;
-            readRequest.ServerPassword = CorrectPassword;
+            ReadRequestMessage readRequest = new ReadRequestMessage(startTimestampExpected, CorrectPassword);
 
             using (BookmarkableStream clientStream = ClientRequestToStream(readRequest))
             {
@@ -64,8 +62,7 @@ namespace RemoteHarvesterTest
 
         private void VerifyPasswordResult(string correctPassword, string suppliedPassword, bool expectPasswordIsCorrect)
         {
-            ReadRequestMessage readRequest = new ReadRequestMessage();
-            readRequest.ServerPassword = suppliedPassword;
+            ReadRequestMessage readRequest = new ReadRequestMessage(new DateTime(0), suppliedPassword);
 
             using (BookmarkableStream clientStream = ClientRequestToStream(readRequest))
             {

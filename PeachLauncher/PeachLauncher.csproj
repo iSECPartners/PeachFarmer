@@ -7,7 +7,7 @@
     <ProjectGuid>{CB19FB4E-C3EB-4350-AF66-B4A95185D33E}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FuzzingWorker</RootNamespace>
+    <RootNamespace>PeachLauncher</RootNamespace>
     <AssemblyName>FuzzingWorker</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
