@@ -10,6 +10,12 @@ namespace PeachLauncher
     [ServiceContract]
     public interface ILauncherService
     {
+        string PeachBinaryPath { get; set; }
+
+        string PeachCmdLineArgs { get; set; }
+
+        string PeachWorkingDirectory { get; set; }
+
         [OperationContract]
         void Launch(UInt64 startIteration, UInt64 endIteration);
 

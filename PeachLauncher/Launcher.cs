@@ -9,31 +9,20 @@ namespace PeachLauncher
 {
     public class Launcher : ILauncherService
     {
-        private string _peachBinPath;
-        private string _cmdLineArgs;
-        private string _workingDirectory;
-
         private Process _peachProcess;
 
-        //public PeachLauncher(string peachBinPath, string cmdLineArgs, string workingDirectory)
-        //{
-        //    _peachBinPath = peachBinPath;
-        //    _cmdLineArgs = cmdLineArgs;
-        //    _workingDirectory = workingDirectory;
-
-        //    _peachProcess = null;
-        //}
+        public string PeachBinaryPath { get; set; }
+        
+        public string PeachCmdLineArgs { get; set; }
+        
+        public string PeachWorkingDirectory { get; set; }
 
         public void Launch(UInt64 startIteration, UInt64 endIteration)
         {
-            _peachBinPath = @"D:\peach-3.1.54\Peach.exe";
-            _cmdLineArgs = "--seed=0 --definedvalues=rtsp.conf.xml rtsp.xml Vlc";
-            _workingDirectory = @"D:\RtspFuzzer";
+            string cmdLineArgs = string.Format("--range={0},{1} {2}", startIteration, endIteration, PeachCmdLineArgs);
 
-            string cmdLineArgs = string.Format("--range={0},{1} {2}", startIteration, endIteration, _cmdLineArgs);
-
-            ProcessStartInfo startInfo = new ProcessStartInfo(_peachBinPath, cmdLineArgs);
-            startInfo.WorkingDirectory = _workingDirectory;
+            ProcessStartInfo startInfo = new ProcessStartInfo(PeachBinaryPath, cmdLineArgs);
+            startInfo.WorkingDirectory = PeachWorkingDirectory;
             startInfo.CreateNoWindow = true;
 
             _peachProcess = Process.Start(startInfo);

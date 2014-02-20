@@ -1,4 +1,5 @@
 ﻿using PeachFarmerLib;
+using PeachLauncher;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,10 +38,11 @@ namespace RemoteHarvester
             Console.WriteLine("Listening for connections on port {0}", listenPort.ToString());
 
             PeachFolderPackager packager = new PeachFolderPackager(new FileSystem());
+            Launcher peachLauncher = new Launcher();
 
             using (NetworkServerConnection tcpServer = CreateNetworkConnection(listenPort, _serverCertFile, _clientCertFile))
             {
-                RequestListener folderMontior = new RequestListener(tcpServer, packager, new Clock(), _folderPath, _connectionPassword);
+                RequestListener folderMontior = new RequestListener(tcpServer, packager, new Clock(), _folderPath, peachLauncher, _connectionPassword);
 
                 folderMontior.Monitor();
             }

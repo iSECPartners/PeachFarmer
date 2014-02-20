@@ -9,6 +9,7 @@ using PeachFarmerTest.MockObjects;
 using PeachFarmerTest;
 using PeachFarmerLib.Messages;
 using RemoteHarvesterTest.TestStreams;
+using RemoteHarvesterTest.MockObjects;
 
 namespace RemoteHarvesterTest
 {
@@ -39,7 +40,7 @@ namespace RemoteHarvesterTest
             using (BookmarkableStream clientStream = ClientRequestToStream(readRequest))
             {
                 MockNetworkConnection networkConnection = new MockNetworkConnection(clientStream);
-                RequestListener folderMonitor = new RequestListener(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", CorrectPassword);
+                RequestListener folderMonitor = new RequestListener(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", null, CorrectPassword);
                 folderMonitor.ProcessNextRequest();
                 Assert.AreEqual(@"c:\fakepath\fakedir", mockFolderPackager.LastFolderPacked);
                 Assert.AreEqual(startTimestampExpected, mockFolderPackager.LastModifiedMinimumRequested);
@@ -70,7 +71,7 @@ namespace RemoteHarvesterTest
                 MockFolderPackager mockFolderPackager = new MockFolderPackager();
                 MockClock serverClock = new MockClock(new DateTime(2007, 5, 25, 15, 27, 03));
 
-                RequestListener folderMonitor = new RequestListener(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", correctPassword);
+                RequestListener folderMonitor = new RequestListener(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", null, correctPassword);
                 folderMonitor.ProcessNextRequest();
 
                 clientStream.ResetToBookmark();

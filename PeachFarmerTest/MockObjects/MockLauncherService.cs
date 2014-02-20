@@ -9,6 +9,12 @@ namespace RemoteHarvesterTest.MockObjects
 {
     class MockLauncherService : ILauncherService
     {
+        public string PeachBinaryPath { get; set; }
+
+        public string PeachCmdLineArgs { get; set; }
+
+        public string PeachWorkingDirectory { get; set; }
+
         public UInt64? AssignedStartIteration { get; private set; }
 
         public UInt64? AssignedEndIteration { get; private set; }

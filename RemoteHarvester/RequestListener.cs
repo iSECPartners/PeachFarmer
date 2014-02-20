@@ -1,6 +1,7 @@
 ﻿using PeachFarmerLib;
 using PeachFarmerLib.Framework;
 using PeachFarmerLib.Messages;
+using PeachLauncher;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,13 +22,13 @@ namespace RemoteHarvester
 
         private Stream _clientStream;
 
-        public RequestListener(INetworkConnection serverConnection, IFolderPacker folderPackager, IClock clock, string folderPath, string password)
+        public RequestListener(INetworkConnection serverConnection, IFolderPacker folderPackager, IClock clock, string folderPath, ILauncherService launcher, string password)
         {
             _serverConnection = serverConnection;
 
             _readRequestProcessor = new ReadRequestProcessor(folderPackager, clock, folderPath, password);
 
-            _assignWorkRequestProcessor = new AssignWorkRequestProcessor(null, password);
+            _assignWorkRequestProcessor = new AssignWorkRequestProcessor(launcher, password);
         }
 
         public void Monitor()
