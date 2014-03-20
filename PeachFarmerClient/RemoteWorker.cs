@@ -56,6 +56,22 @@ namespace PeachFarmerClient
             }
         }
 
+        public string RemoteAddress
+        {
+            get
+            {
+                return _networkConnection.RemoteAddress;
+            }
+        }
+
+        public DateTime LastPullTime
+        {
+            get
+            {
+                return _filePuller.LastPullTime;
+            }
+        }
+
         public void PullFiles(string destinationFolder)
         {
             Console.WriteLine("Pulling files from {0}", this.ToString());
@@ -66,11 +82,6 @@ namespace PeachFarmerClient
             }
 
             PrintLastStatus();
-        }
-
-        public IWorkerInfo GetInfo()
-        {
-            return new WorkerInfo(_id, _networkConnection.RemoteAddress, _filePuller.LastPullTime);
         }
 
         private void PrintLastStatus()
@@ -108,6 +119,41 @@ namespace PeachFarmerClient
             {
                 return _networkConnection.RemoteAddress;
             }
+        }
+
+        public static List<RemoteWorker> MergeWorkers(List<RemoteWorker> primaryList, List<RemoteWorker> extraList)
+        {
+            List<RemoteWorker> mergedList = new List<RemoteWorker>();
+
+            foreach (RemoteWorker primaryWorker in primaryList)
+            {
+                RemoteWorker matchingWorker = FindMatchingWorker(extraList, primaryWorker);
+
+                if (matchingWorker != null)
+                {
+                    mergedList.Add(matchingWorker);
+                }
+                else
+                {
+                    mergedList.Add(primaryWorker);
+                }
+            }
+
+            return mergedList;
+        }
+
+        private static RemoteWorker FindMatchingWorker(IEnumerable<RemoteWorker> workers, RemoteWorker toMatch)
+        {
+            foreach (RemoteWorker worker in workers)
+            {
+                if ((!string.IsNullOrEmpty(worker.Id) && (worker.Id == toMatch.Id)) ||
+                    (worker.RemoteAddress == toMatch.RemoteAddress))
+                {
+                    return worker;
+                }
+            }
+
+            return null;
         }
 
         /*

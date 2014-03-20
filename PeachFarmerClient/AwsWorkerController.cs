@@ -17,19 +17,17 @@ namespace PeachFarmerClient
         {
             _ec2Client = AWSClientFactory.CreateAmazonEC2Client();
         }
-        public List<IWorkerInfo> GetWorkersInfo()
+
+        public List<Instance> GetWorkerInstances()
         {
-            List<IWorkerInfo> workersInfo = new List<IWorkerInfo>();
+            List<Instance> instances = new List<Instance>();
 
             try
             {
                 DescribeInstancesResponse ec2Response = _ec2Client.DescribeInstances();
                 foreach (Reservation r in ec2Response.Reservations)
                 {
-                    foreach (Instance instance in r.Instances)
-                    {
-                        workersInfo.Add(new WorkerInfo(instance.InstanceId, instance.PublicDnsName));
-                    }
+                    instances.AddRange(r.Instances);
                 }
             }
             catch (AmazonEC2Exception ex)
@@ -49,7 +47,7 @@ namespace PeachFarmerClient
                 }
             }
 
-            return workersInfo;
+            return instances;
         }
     }
 }

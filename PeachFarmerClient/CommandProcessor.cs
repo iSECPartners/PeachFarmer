@@ -14,27 +14,27 @@ namespace PeachFarmerClient
     {
         private List<RemoteWorker> _workers;
 
-        private WorkerInfoSerializer _workerInfoSerializer;
+        private RemoteWorkerFactory _workerFactory;
 
         private string _destinationFolder;
 
         private string _serverPassword;
 
-        private string _serverCertFile;
-
-        private string _clientCertFile;
+        private SavedWorkerManager _savedWorkerManager;
 
         public CommandProcessor(CommandLineOptions options)
         {
-            _workerInfoSerializer = new WorkerInfoSerializer();
+            IConnectionManager connectionManager = CreateConnectionManager(options.ServerCertFile, options.ClientCertFile);
+
+            _workerFactory = new RemoteWorkerFactory(connectionManager, options.Password);
 
             _destinationFolder = options.DestinationFolder;
 
             _serverPassword = options.Password;
 
-            _serverCertFile = options.ServerCertFile;
+            string workerSaveFile = GetSerializedWorkerPath(_destinationFolder);
 
-            _clientCertFile = options.ClientCertFile;
+            _savedWorkerManager = new SavedWorkerManager(workerSaveFile);
 
             _workers = WorkersFromCommandLineOptions(options);
         }
@@ -57,109 +57,17 @@ namespace PeachFarmerClient
                 }
             }
 
-            SaveWorkerInfo();
+            _savedWorkerManager.SaveWorkers(_workers);
         }
 
         private List<RemoteWorker> WorkersFromCommandLineOptions(CommandLineOptions options)
         {
-            List<IWorkerInfo> workersInfo = WorkerInfoFromCommandLineOptions(options);
-
-            workersInfo = UpdateWorkerInfoFromSaveFile(workersInfo);
-
-            return WorkersFromInfo(workersInfo);
-        }
-
-        private List<IWorkerInfo> UpdateWorkerInfoFromSaveFile(List<IWorkerInfo> workersInfo)
-        {
-            List<IWorkerInfo> savedWorkersInfo = WorkerInfoFromSaveFile(_destinationFolder);
-
-            if (savedWorkersInfo == null)
-            {
-                return workersInfo;
-            }
-
-            List<IWorkerInfo> updatedWorkersInfo = new List<IWorkerInfo>();
-
-            foreach (IWorkerInfo commandLineWorkerInfo in workersInfo)
-            {
-                IWorkerInfo matchingInfo = FindMatchingWorkerInfo(savedWorkersInfo, commandLineWorkerInfo);
-
-                if (matchingInfo != null)
-                {
-                    updatedWorkersInfo.Add(matchingInfo);
-                }
-                else
-                {
-                    updatedWorkersInfo.Add(commandLineWorkerInfo);
-                }
-            }
-
-            return updatedWorkersInfo;
-        }
-
-        private IWorkerInfo FindMatchingWorkerInfo(IEnumerable<IWorkerInfo> workersInfo, IWorkerInfo toMatch)
-        {
-            foreach (IWorkerInfo workerInfo in workersInfo)
-            {
-                if ((!string.IsNullOrEmpty(workerInfo.Id) && (workerInfo.Id == toMatch.Id)) || 
-                    (workerInfo.RemoteAddress == toMatch.RemoteAddress))
-                {
-                    return workerInfo;
-                }
-            }
-
-            return null;
-        }
-
-        private List<IWorkerInfo> WorkerInfoFromSaveFile(string _destinationFolder)
-        {
-            List<IWorkerInfo> savedWorkersInfo = new List<IWorkerInfo>();
-            string savedFilePath = GetWorkerInfoPath(_destinationFolder);
-
-            if (!File.Exists(savedFilePath))
-            {
-                return null;
-            }
-
-            try
-            {
-                using (Stream savedInfoStream = File.OpenRead(savedFilePath))
-                {
-                    savedWorkersInfo.AddRange(_workerInfoSerializer.DeserializeWorkerInfoList(savedInfoStream));
-                }
-            }
-            catch (IOException)
-            {
-                return null;
-            }
-
-            return savedWorkersInfo;
-        }
-
-        private void SaveWorkerInfo()
-        {
-            List<IWorkerInfo> savedWorkersInfo = new List<IWorkerInfo>();
-            string savedFilePath = GetWorkerInfoPath(_destinationFolder);
-
-            foreach (RemoteWorker worker in _workers)
-            {
-                savedWorkersInfo.Add(worker.GetInfo());
-            }
-
-            using (Stream savedInfoStream = File.OpenWrite(savedFilePath))
-            {
-                _workerInfoSerializer.SerializeWorkerInfoList(savedInfoStream, savedWorkersInfo);
-            }
-        }
-
-        private List<IWorkerInfo> WorkerInfoFromCommandLineOptions(CommandLineOptions options)
-        {
-            List<IWorkerInfo> workerHosts = new List<IWorkerInfo>();
+            List<RemoteWorker> remoteWorkers = new List<RemoteWorker>();
 
             if (options.WorkerHost != null)
             {
-                workerHosts.Add(new WorkerInfo(options.WorkerHost));
-                return workerHosts;
+                remoteWorkers.Add(_workerFactory.CreateRemoteWorker(options.WorkerHost));
+                return remoteWorkers;
             }
 
             if (options.WorkerHostFile != null)
@@ -175,8 +83,8 @@ namespace PeachFarmerClient
                     {
                         foreach (string workerAddress in TargetFileParser.ParseTargets(workerHostFileStream))
                         {
-                            IWorkerInfo workerInfo = new WorkerInfo(workerAddress);
-                            workerHosts.Add(workerInfo);
+                            RemoteWorker worker = _workerFactory.CreateRemoteWorker(workerAddress);
+                            remoteWorkers.Add(worker);
                         }
                     }
                 }
@@ -190,77 +98,41 @@ namespace PeachFarmerClient
             if (options.UseAws)
             {
                 AwsWorkerController aws = new AwsWorkerController();
-                List<IWorkerInfo> workers = aws.GetWorkersInfo();
-                Console.WriteLine("Found {0} AWS workers", workers.Count);
-                foreach (IWorkerInfo worker in workers)
+                
+                List<Amazon.EC2.Model.Instance> awsWorkers = aws.GetWorkerInstances();
+                Console.WriteLine("Found {0} AWS workers", awsWorkers.Count);
+                foreach (Amazon.EC2.Model.Instance instance in awsWorkers)
                 {
-                    Console.WriteLine(worker);
+                    RemoteWorker awsWorker = _workerFactory.CreateRemoteWorker(instance.PublicDnsName, instance.InstanceId, null);
+                    remoteWorkers.Add(awsWorker);
                 }
             }
 
-            return workerHosts;
+            remoteWorkers = _savedWorkerManager.UpdateWorkersWithSavedData(_workerFactory, remoteWorkers);
+
+            return remoteWorkers;
         }
 
-        private List<RemoteWorker> WorkersFromInfo(IEnumerable<IWorkerInfo> workersInfo)
+        private string GetSerializedWorkerPath(string destinationFolder)
         {
-            List<RemoteWorker> workers = new List<RemoteWorker>();
-
-            foreach (IWorkerInfo workerInfo in workersInfo)
-            {
-                workers.Add(WorkerFromInfo(workerInfo));
-            }
-
-            return workers;
+            return Path.Combine(destinationFolder, ".serializedworkers.dat");
         }
 
-        private RemoteWorker WorkerFromInfo(IWorkerInfo workerInfo)
+        private IConnectionManager CreateConnectionManager(string serverCertFile, string clientCertFile)
         {
-            FileSystem fs = new FileSystem();
-
-            string unpackerDisambiguator;
-            if (workerInfo.Id != null)
+            if (string.IsNullOrEmpty(serverCertFile))
             {
-                unpackerDisambiguator = workerInfo.Id;
-            }
-            else
-            {
-                unpackerDisambiguator = workerInfo.RemoteAddress;
+                return new ConnectionManager();
             }
 
-            FolderUnpacker unpacker = new FolderUnpacker(fs, unpackerDisambiguator);
-
-            NetworkClientConnection networkConnection = CreateNetworkConnection(workerInfo.RemoteAddress,
-                                                                                PeachFarmerProtocol.FarmerPort,
-                                                                                _serverCertFile,
-                                                                                _clientCertFile);
-            FilePuller filePuller = new FilePuller(unpacker, _serverPassword, workerInfo.LastPullTime);
-
-            return new RemoteWorker(workerInfo.Id, networkConnection, filePuller, new StatusFileParser());
-        }
-
-        private NetworkClientConnection CreateNetworkConnection(string host, int listenPort, string serverCertFile, string clientCertFile)
-        {
-            const int ConnectionTimeoutInSeconds = 30;
-
-            if (serverCertFile != null)
+            byte[] serverCertData = File.ReadAllBytes(serverCertFile);
+            byte[] clientCertData = null;
+            if (!string.IsNullOrEmpty(clientCertFile))
             {
-                byte[] serverCertData = File.ReadAllBytes(serverCertFile);
-                byte[] clientCertData = null;
-                if (clientCertFile != null)
-                {
-                    clientCertData = File.ReadAllBytes(clientCertFile);
-                }
-                return new NetworkSslClientConnection(host, listenPort, ConnectionTimeoutInSeconds, serverCertData, clientCertData);
+                clientCertData = File.ReadAllBytes(clientCertFile);
             }
-            else
-            {
-                return new NetworkClientConnection(host, listenPort, ConnectionTimeoutInSeconds);
-            }
-        }
 
-        private string GetWorkerInfoPath(string destinationFolder)
-        {
-            return Path.Combine(destinationFolder, ".workerinfo.dat");
+            return new ConnectionManager(serverCertData, clientCertData);
         }
     }
 }

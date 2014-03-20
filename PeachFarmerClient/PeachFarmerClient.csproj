@@ -50,6 +50,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AwsWorkerController.cs" />
+    <Compile Include="ConnectionManager.cs" />
+    <Compile Include="Framework\IConnectionManager.cs" />
     <Compile Include="Framework\IFilePuller.cs" />
     <Compile Include="Framework\INetworkClientConnection.cs" />
     <Compile Include="Framework\INetworkStreamCreator.cs" />
@@ -68,10 +70,11 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteWorker.cs" />
+    <Compile Include="RemoteWorkerFactory.cs" />
+    <Compile Include="RemoteWorkerSerializer.cs" />
+    <Compile Include="SavedWorkerManager.cs" />
     <Compile Include="StatusFileParser.cs" />
     <Compile Include="TargetFileParser.cs" />
-    <Compile Include="WorkerInfo.cs" />
-    <Compile Include="WorkerInfoSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
