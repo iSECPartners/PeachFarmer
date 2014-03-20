@@ -62,7 +62,6 @@
     <Compile Include="FolderUnpacker.cs" />
     <Compile Include="Framework\IFolderUnpacker.cs" />
     <Compile Include="Framework\IStatusFileParser.cs" />
-    <Compile Include="Framework\IWorkerPullHistory.cs" />
     <Compile Include="NetworkClientConnection.cs" />
     <Compile Include="NetworkSslClientConnection.cs" />
     <Compile Include="PeachStatus.cs" />
