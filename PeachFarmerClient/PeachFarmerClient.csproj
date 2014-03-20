@@ -55,7 +55,6 @@
     <Compile Include="Framework\IFilePuller.cs" />
     <Compile Include="Framework\INetworkClientConnection.cs" />
     <Compile Include="Framework\INetworkStreamCreator.cs" />
-    <Compile Include="Framework\IWorkerInfo.cs" />
     <Compile Include="Framework\ICloudWorkerController.cs" />
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="CommandProcessor.cs" />
