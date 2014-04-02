@@ -1,7 +1,6 @@
 ﻿using PeachFarmerLib;
 using PeachFarmerLib.Framework;
 using PeachFarmerLib.Messages;
-using PeachLauncher;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,17 +17,13 @@ namespace RemoteHarvester
 
         private ReadRequestProcessor _readRequestProcessor;
 
-        private AssignWorkRequestProcessor _assignWorkRequestProcessor;
-
         private Stream _clientStream;
 
-        public RequestListener(INetworkConnection serverConnection, IFolderPacker folderPackager, IClock clock, string folderPath, ILauncherService launcher, string password)
+        public RequestListener(INetworkConnection serverConnection, IFolderPacker folderPackager, IClock clock, string folderPath, string password)
         {
             _serverConnection = serverConnection;
 
             _readRequestProcessor = new ReadRequestProcessor(folderPackager, clock, folderPath, password);
-
-            _assignWorkRequestProcessor = new AssignWorkRequestProcessor(launcher, password);
         }
 
         public void Monitor()
@@ -59,15 +54,6 @@ namespace RemoteHarvester
                     {
                         Console.WriteLine("ReadRequest from client at {0}", DateTime.Now);
                         ResponseMessageBase response = _readRequestProcessor.Process(request);
-                        Console.WriteLine("Sending response...");
-                        SendResponse(response);
-                        Console.WriteLine("Done!");
-                        break;
-                    }
-                case PeachFarmerProtocol.AssignWorkRequest:
-                    {
-                        Console.WriteLine("AssignWorkRequest from client at {0}", DateTime.Now);
-                        ResponseMessageBase response = _assignWorkRequestProcessor.Process(request);
                         Console.WriteLine("Sending response...");
                         SendResponse(response);
                         Console.WriteLine("Done!");

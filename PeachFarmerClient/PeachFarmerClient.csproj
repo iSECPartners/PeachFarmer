@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AWSSDK">
-      <HintPath>C:\Program Files (x86)\AWS SDK for .NET\bin\Net45\AWSSDK.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.2.0.13.0\lib\net45\AWSSDK.dll</HintPath>
     </Reference>
     <Reference Include="CommandLine">
       <HintPath>..\ExternalLibs\CommandLine.dll</HintPath>
@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PeachFarmerLib\PeachFarmerLib.csproj">

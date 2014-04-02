@@ -40,7 +40,7 @@ namespace RemoteHarvesterTest
             using (BookmarkableStream clientStream = ClientRequestToStream(readRequest))
             {
                 MockNetworkConnection networkConnection = new MockNetworkConnection(clientStream);
-                RequestListener folderMonitor = new RequestListener(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", null, CorrectPassword);
+                RequestListener folderMonitor = new RequestListener(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", CorrectPassword);
                 folderMonitor.ProcessNextRequest();
                 Assert.AreEqual(@"c:\fakepath\fakedir", mockFolderPackager.LastFolderPacked);
                 Assert.AreEqual(startTimestampExpected, mockFolderPackager.LastModifiedMinimumRequested);
@@ -71,7 +71,7 @@ namespace RemoteHarvesterTest
                 MockFolderPackager mockFolderPackager = new MockFolderPackager();
                 MockClock serverClock = new MockClock(new DateTime(2007, 5, 25, 15, 27, 03));
 
-                RequestListener folderMonitor = new RequestListener(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", null, correctPassword);
+                RequestListener folderMonitor = new RequestListener(networkConnection, mockFolderPackager, serverClock, @"c:\fakepath\fakedir", correctPassword);
                 folderMonitor.ProcessNextRequest();
 
                 clientStream.ResetToBookmark();

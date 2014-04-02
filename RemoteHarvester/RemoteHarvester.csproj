@@ -62,7 +62,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssignWorkRequestProcessor.cs" />
     <Compile Include="Clock.cs" />
     <Compile Include="CommandLineOptions.cs" />
     <Compile Include="CommandProcessor.cs" />
@@ -84,10 +83,6 @@
     <ProjectReference Include="..\PeachFarmerLib\PeachFarmerLib.csproj">
       <Project>{5da35c75-e83b-4a68-a461-424b5e84897e}</Project>
       <Name>PeachFarmerLib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PeachLauncher\PeachLauncher.csproj">
-      <Project>{cb19fb4e-c3eb-4350-af66-b4a95185d33e}</Project>
-      <Name>PeachLauncher</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
